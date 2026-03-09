@@ -9,11 +9,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/tez-capital/tezpeak/core/common"
-	"github.com/tez-capital/tezpeak/core/providers/tezbake"
-	"github.com/tez-capital/tezpeak/core/providers/tezpay"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/mavpeak/core/common"
+	"github.com/mavryk-network/mavpeak/core/providers/mavbake"
+	"github.com/mavryk-network/mavpeak/core/providers/mavpay"
 )
 
 type client struct {
@@ -195,25 +195,25 @@ func Run(ctx context.Context, config *configuration.Runtime, app *fiber.Group) e
 	// modules
 	for id := range config.Modules {
 		switch id {
-		case constants.TEZBAKE_MODULE_ID:
-			ok, configuration := config.GetTezbakeModuleConfiguration()
+		case constants.MAVBAKE_MODULE_ID:
+			ok, configuration := config.GetMavbakeModuleConfiguration()
 			if !ok {
-				slog.Warn("tezbake module configured but not loaded")
+				slog.Warn("mavbake module configured but not loaded")
 				continue
 			}
 
-			err := tezbake.SetupModule(ctx, configuration, app, createModuleStatusChannel(id, statusChannel))
+			err := mavbake.SetupModule(ctx, configuration, app, createModuleStatusChannel(id, statusChannel))
 			if err != nil {
 				return err
 			}
-		case constants.TEZPAY_MODULE_ID:
-			ok, configuration := config.GetTezpayModuleConfiguration()
+		case constants.MAVPAY_MODULE_ID:
+			ok, configuration := config.GetMavpayModuleConfiguration()
 			if !ok {
-				slog.Warn("tezpay module configured but not loaded")
+				slog.Warn("mavpay module configured but not loaded")
 				continue
 			}
 
-			err := tezpay.SetupModule(ctx, configuration, app, createModuleStatusChannel(id, statusChannel))
+			err := mavpay.SetupModule(ctx, configuration, app, createModuleStatusChannel(id, statusChannel))
 			if err != nil {
 				return err
 			}

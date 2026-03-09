@@ -1,7 +1,7 @@
-package tezbake
+package mavbake
 
 import (
-	"github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavpeak/core/common"
 )
 
 var (

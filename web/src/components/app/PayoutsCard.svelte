@@ -3,16 +3,16 @@
 	import Card from '@components/starlight/components/Card.svelte';
 	import Button from '../starlight/components/Button.svelte';
 	import Separator from './Separator.svelte';
-	import { services, wallet } from '@app/state/tezpay';
+	import { services, wallet } from '@app/state/mavpay';
 	import { formatBalance } from '@src/util/format';
-	import { extractContinualServiceInfo } from '@src/util/tezpay';
+	import { extractContinualServiceInfo } from '@src/util/mavpay';
 
 	function open_governance() {
-		goto('/tezpay');
+		goto('/mavpay');
 	}
 
-	$: hasTezpayStatus = !!extractContinualServiceInfo($services.applications?.tezpay);
-	$: isTezpayRunning = extractContinualServiceInfo($services.applications?.tezpay)?.status === 'running';
+	$: hasMavpayStatus = !!extractContinualServiceInfo($services.applications?.mavpay);
+	$: isMavpayRunning = extractContinualServiceInfo($services.applications?.mavpay)?.status === 'running';
 </script>
 
 <div class="governance-wrap">
@@ -26,9 +26,9 @@
 			<div class="payouts-info">
 				<div class="row" />
 				<div class="property">Automatic Payouts:</div>
-				{#if !hasTezpayStatus}
+				{#if !hasMavpayStatus}
 					<div class="value automatic-payouts-status">DISABLED</div>
-				{:else if isTezpayRunning}
+				{:else if isMavpayRunning}
 					<div class="value automatic-payouts-status ok">ACTIVE</div>
 				{:else}
 					<div class="value automatic-payouts-status warn">INACTIVE</div>

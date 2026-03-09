@@ -9,7 +9,7 @@ export const APP_CONNECTION_STATUS = writable("disconnected") as Writable<Status
 export const state = writable(EMPTY_PEAK_STATUS) as Writable<PeakStatus>
 export const APP_ID = derived(state, $state => {
 	const subId = $state?.id
-	return subId ? `TEZPEAK - ${subId}` : "TEZPEAK"
+	return subId ? `MAVPEAK - ${subId}` : "MAVPEAK"
 })
 
 const provider = new StatusProvider("/api/sse")

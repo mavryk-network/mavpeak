@@ -1,9 +1,9 @@
-import { EmptyTezpayInfo, type PayoutBlueprint, type TezpayInfo } from "@src/common/types/tezpay"
+import { EmptyMavpayInfo, type PayoutBlueprint, type MavpayInfo } from "@src/common/types/mavpay"
 import { readBody } from "@src/util/fetch"
 
-export async function getTezpayInfo() {
+export async function getMavpayInfo() {
 	try {
-		const response = await fetch('/api/tezpay/info', {
+		const response = await fetch('/api/mavpay/info', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -11,13 +11,13 @@ export async function getTezpayInfo() {
 		})
 
 		if (response.status !== 200) {
-			throw new Error('Failed to get tezpay info')
+			throw new Error('Failed to get mavpay info')
 		}
 
-		return await response.json() as TezpayInfo
+		return await response.json() as MavpayInfo
 	} catch (e) {
 		console.log(e)
-		return EmptyTezpayInfo
+		return EmptyMavpayInfo
 	}
 }
 
@@ -25,7 +25,7 @@ export async function generatePayuts(cycle: number | undefined, cb: (message: st
 	const cycleQuery = cycle ? `cycle=${cycle}` : ''
 	const dryQuery = dry ? `dry=${dry}` : ''
 
-	const response = await fetch(`/api/tezpay/generate-payouts?${cycleQuery}&${dryQuery}`, {
+	const response = await fetch(`/api/mavpay/generate-payouts?${cycleQuery}&${dryQuery}`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export async function generatePayuts(cycle: number | undefined, cb: (message: st
 export async function executePayuts(blueprint: PayoutBlueprint, cb: (message: string) => void, dry?: boolean) {
 	const dryQuery = dry ? `dry=${dry}` : ''
 
-	const response = await fetch(`/api/tezpay/pay?${dryQuery}`, {
+	const response = await fetch(`/api/mavpay/pay?${dryQuery}`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ export async function executePayuts(blueprint: PayoutBlueprint, cb: (message: st
 }
 
 export async function stopContinual() {
-	const response = await fetch('/api/tezpay/stop-continual', {
+	const response = await fetch('/api/mavpay/stop-continual', {
 		method: 'GET',
 	})
 
@@ -93,7 +93,7 @@ export async function stopContinual() {
 }
 
 export async function startContinual() {
-	const response = await fetch('/api/tezpay/start-continual', {
+	const response = await fetch('/api/mavpay/start-continual', {
 		method: 'GET',
 	})
 
@@ -105,7 +105,7 @@ export async function startContinual() {
 }
 
 export async function disableContinual() {
-	const response = await fetch('/api/tezpay/disable-continual', {
+	const response = await fetch('/api/mavpay/disable-continual', {
 		method: 'GET',
 	})
 
@@ -116,7 +116,7 @@ export async function disableContinual() {
 }
 
 export async function enableContinual() {
-	const response = await fetch('/api/tezpay/enable-continual', {
+	const response = await fetch('/api/mavpay/enable-continual', {
 		method: 'GET',
 	})
 
@@ -127,7 +127,7 @@ export async function enableContinual() {
 }
 
 export async function listReports(dry?: boolean) {
-	const response = await fetch(`/api/tezpay/list-reports?dry=${dry === true}`, {
+	const response = await fetch(`/api/mavpay/list-reports?dry=${dry === true}`, {
 		method: 'GET',
 	})
 
@@ -139,7 +139,7 @@ export async function listReports(dry?: boolean) {
 }
 
 export async function getReport(report: string, dry?: boolean) {
-	const response = await fetch(`/api/tezpay/report?id=${report}&dry=${dry === true}`, {
+	const response = await fetch(`/api/mavpay/report?id=${report}&dry=${dry === true}`, {
 		method: 'GET',
 	})
 
@@ -152,7 +152,7 @@ export async function getReport(report: string, dry?: boolean) {
 
 export async function testNotify(notificator = 'all', cb: (message: string) => void) {
 	const query = notificator === "all" ? "" : `notificator=${notificator}`
-	const response = await fetch(`/api/tezpay/test-notify?${query}`, {
+	const response = await fetch(`/api/mavpay/test-notify?${query}`, {
 		method: 'POST',
 	})
 
@@ -164,7 +164,7 @@ export async function testNotify(notificator = 'all', cb: (message: string) => v
 }
 
 export async function testExtensions(cb: (message: string) => void) {
-	const response = await fetch(`/api/tezpay/test-extensions`, {
+	const response = await fetch(`/api/mavpay/test-extensions`, {
 		method: 'POST',
 	})
 

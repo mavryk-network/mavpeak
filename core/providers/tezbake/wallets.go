@@ -1,4 +1,4 @@
-package tezbake
+package mavbake
 
 import (
 	"bufio"
@@ -15,10 +15,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tez-capital/tezbake/ami"
-	"github.com/tez-capital/tezbake/apps/base"
-	"github.com/tez-capital/tezbake/apps/signer"
-	"github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavbake/ami"
+	"github.com/mavryk-network/mavbake/apps/base"
+	"github.com/mavryk-network/mavbake/apps/signer"
+	"github.com/mavryk-network/mavpeak/core/common"
 )
 
 type WalletsStatus map[string]base.AmiWalletInfo

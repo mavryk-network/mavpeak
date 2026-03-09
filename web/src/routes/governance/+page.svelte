@@ -33,7 +33,7 @@
 		TransactionStage,
 		TransactionBuildingEvent
 	} from '@src/common/types/events';
-	import { openTezgov, waitConfirmation } from '@src/app/governance';
+	import { openMavgov, waitConfirmation } from '@src/app/governance';
 
 	let canVote: boolean | undefined;
 	let periodDetail: GovernancePeriodDetail;
@@ -176,13 +176,13 @@
 					<div class="vote-as-select" class:disabled={availablePkhsOptions.length == 1}>
 						<Select label="Vote As" bind:value={selectedPkh} options={availablePkhsOptions} />
 					</div>
-					<div class="open-tezgov">
-						<Button label="or vote with TEZGOV" on:click={() => openTezgov()} />
+					<div class="open-mavgov">
+						<Button label="or vote with MAVGOV" on:click={() => openMavgov()} />
 					</div>
 				{:else if availablePkhsOptions.length === 0}
 					<div class="no-pkhs">❗You have no available PKH to vote with.❗</div>
-					<div class="open-tezgov">
-						<Button label="vote with TEZGOV" on:click={() => openTezgov()} />
+					<div class="open-mavgov">
+						<Button label="vote with MAVGOV" on:click={() => openMavgov()} />
 					</div>
 				{/if}
 			</div>
@@ -293,7 +293,7 @@
 				color: var(--error-color)
 				grid-column: 1 / -1
 
-			.open-tezgov
+			.open-mavgov
 				display: flex
 				justify-content: end
 				align-items: center

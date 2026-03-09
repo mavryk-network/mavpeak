@@ -88,7 +88,7 @@ export type LedgerWalletStatus = {
 	pkh: string
 }
 
-export type TezbakeStatus = {
+export type MavbakeStatus = {
 	rights: RightsStatus,
 	services: ServicesStatus,
 	bakers: BakersStatus,
@@ -101,7 +101,7 @@ export type WalletStatus = {
 	level: string
 }
 
-export type TezpayStatus = {
+export type MavpayStatus = {
 	services: ServicesStatus
 	wallet: WalletStatus
 }
@@ -109,8 +109,8 @@ export type TezpayStatus = {
 export type PeakStatus = {
 	id?: string
 	modules: {
-		"tezbake": TezbakeStatus | undefined
-		"tezpay": TezpayStatus | undefined
+		"mavbake": MavbakeStatus | undefined
+		"mavpay": MavpayStatus | undefined
 	}
 	nodes: NodesStatus
 }

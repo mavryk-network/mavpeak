@@ -11,8 +11,8 @@
 	import BackIcon from '@components/la/icons/angle-left-solid.svelte';
 
 	import { onMount } from 'svelte';
-	import { getReport } from '@src/app/tezpay/client';
-	import type { PayoutReport, CycleReport } from '@src/common/types/tezpay';
+	import { getReport } from '@src/app/mavpay/client';
+	import type { PayoutReport, CycleReport } from '@src/common/types/mavpay';
 	import { formatAddress, formatBalance, formatPercentage } from '@src/util/format';
 	import type { DataTableColumn } from '@src/components/starlight/types';
 	import { writeToClipboard } from '@src/util/clipboard';
@@ -60,7 +60,7 @@
 
 <div class="report-wrap">
 	<div class="navigation-wrap">
-		<Button on:click={() => goto('/tezpay/reports')}>
+		<Button on:click={() => goto('/mavpay/reports')}>
 			<div class="navigation-btn-content"><BackIcon /> BACK</div>
 		</Button>
 	</div>

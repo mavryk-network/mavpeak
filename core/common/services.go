@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tez-capital/tezbake/ami"
-	"github.com/tez-capital/tezbake/apps/base"
-	"github.com/tez-capital/tezpeak/constants"
+	"github.com/mavryk-network/mavbake/ami"
+	"github.com/mavryk-network/mavbake/apps/base"
+	"github.com/mavryk-network/mavpeak/constants"
 )
 
 type ApplicationServices *map[string]base.AmiServiceInfo

@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/trilitech/tzgo/rpc"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 func TryUnwrapRPCError(err error) error {

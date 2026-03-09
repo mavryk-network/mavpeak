@@ -1,7 +1,7 @@
-export type TezpayInfo = {
+export type MavpayInfo = {
 	version: {
-		["ami-tezpay"]: string
-		tezpay: string
+		["ami-mavpay"]: string
+		mavpay: string
 	}
 	payout_wallet: string
 	configuration: {
@@ -10,10 +10,10 @@ export type TezpayInfo = {
 	} & object
 }
 
-export const EmptyTezpayInfo: TezpayInfo = {
+export const EmptyMavpayInfo: MavpayInfo = {
 	version: {
-		["ami-tezpay"]: 'unknown',
-		tezpay: 'unknown'
+		["ami-mavpay"]: 'unknown',
+		mavpay: 'unknown'
 	},
 	payout_wallet: '',
 	configuration: {

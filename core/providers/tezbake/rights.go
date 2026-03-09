@@ -1,4 +1,4 @@
-package tezbake
+package mavbake
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"slices"
 
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpeak/core/common"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpeak/core/common"
+	"github.com/mavryk-network/gomavryk/rpc"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type BlockRights struct {
@@ -190,9 +190,9 @@ func checkRealized(ctx context.Context, rights BlockRights) (BlockRights, error)
 		for _, tx := range g {
 			for _, c := range tx.Contents {
 				switch c.Kind() {
-				case tezos.OpTypeAttestation, tezos.OpTypeAttestationWithDal:
+				case mavryk.OpTypeAttestation, mavryk.OpTypeAttestationWithDal:
 					acc = append(acc, c.Meta().Delegate.String())
-				case tezos.OpTypeAttestationsAggregate:
+				case mavryk.OpTypeAttestationsAggregate:
 					op := c.(*rpc.AttestationsAggregate)
 					for _, committee := range op.Metadata.CommitteeMetadata {
 						acc = append(acc, committee.Delegate.String())

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/trilitech/tzgo/rpc"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 type Block struct {

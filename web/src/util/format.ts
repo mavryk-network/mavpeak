@@ -51,18 +51,18 @@ export function formatTimestampAgoStrict(timestamp: string | number) {
   return formatDistanceStrict(new Date(timestamp), new Date(), { addSuffix: true })
 }
 
-export function formatBalance(mutez: string | bigint | number) {
-  if (typeof mutez === "bigint" || typeof mutez === "number") {
-    mutez = mutez.toString()
+export function formatBalance(mumav: string | bigint | number) {
+  if (typeof mumav === "bigint" || typeof mumav === "number") {
+    mumav = mumav.toString()
   }
-  if (!mutez || typeof mutez !== "string") {
+  if (!mumav || typeof mumav !== "string") {
     return "N/A"
   }
-  if (mutez === "0") {
+  if (mumav === "0") {
     return "0 ꜩ"
   }
-  mutez = mutez.padStart(7, "0")
-  return `${mutez.substring(0, mutez.length - 6)}.${mutez.substring(mutez.length - 6)} ꜩ`
+  mumav = mumav.padStart(7, "0")
+  return `${mumav.substring(0, mumav.length - 6)}.${mumav.substring(mumav.length - 6)} ꜩ`
 }
 
 export function formatPercentage(percentage: number | string) {

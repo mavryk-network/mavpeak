@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezpeak/constants"
+	"github.com/mavryk-network/mavpeak/constants"
 )
 
 type moduleConfigurationbase struct {
@@ -34,7 +34,7 @@ type deserializedConfigVersion struct {
 	Version int `json:"version,omitempty"`
 }
 
-type TezosNode struct {
+type MavrykNode struct {
 	Address               string `json:"address"`
 	IsRightsProvider      bool   `json:"is_rights_provider,omitempty"`
 	IsBlockProvider       bool   `json:"is_block_provider,omitempty"`
@@ -45,31 +45,17 @@ type TezosNode struct {
 }
 
 var (
-	TF_RPC = TezosNode{
-		Address:              "https://rpc.tzbeta.net/",
+	MVD_RPC = MavrykNode{
+		Address:              "https://rpc.mavryk.network/",
 		IsGovernanceProvider: true,
 	}
-	TZKT_RPC = TezosNode{
-		Address:              "https://rpc.tzkt.io/mainnet/",
+	MVKT_RPC = MavrykNode{
+		Address:              "https://mainnet.rpc.mavryk.network/",
 		IsBlockProvider:      true,
 		IsRightsProvider:     true,
 		IsGovernanceProvider: true,
 	}
-	TZC_EU_RPC = TezosNode{
-		Address:              "https://eu.rpc.tez.capital/",
-		IsBlockProvider:      true,
-		IsRightsProvider:     true,
-		IsGovernanceProvider: true,
-		Priority:             50,
-	}
-	TZC_US_RPC = TezosNode{
-		Address:              "https://us.rpc.tez.capital/",
-		IsBlockProvider:      true,
-		IsRightsProvider:     true,
-		IsGovernanceProvider: true,
-		Priority:             50,
-	}
-	BAKER_NODE = TezosNode{
+	BAKER_NODE = MavrykNode{
 		Address:               "http://127.0.0.1:8732/",
 		IsRightsProvider:      true,
 		IsBlockProvider:       true,
@@ -84,12 +70,12 @@ type Runtime struct {
 	Id     string
 	Listen string
 	Mode   PeakMode
-	// path to the root where are the apps located e.g. /bake-buddy
+	// path to the root where are the apps located e.g. /mavbake
 	AppRoot string
 
 	Modules map[string]json.RawMessage `json:"modules,omitempty"`
 
-	Nodes map[string]TezosNode
+	Nodes map[string]MavrykNode
 }
 
 func gerDefaultRuntime() *Runtime {
@@ -101,16 +87,16 @@ func gerDefaultRuntime() *Runtime {
 	}
 }
 
-func (v *Runtime) GetTezbakeModuleConfiguration() (bool, *TezbakeModuleConfiguration) {
-	rawConfiguration, ok := v.Modules[constants.TEZBAKE_MODULE_ID]
+func (v *Runtime) GetMavbakeModuleConfiguration() (bool, *MavbakeModuleConfiguration) {
+	rawConfiguration, ok := v.Modules[constants.MAVBAKE_MODULE_ID]
 	if !ok {
 		return false, nil
 	}
 
-	configuration := getDefaultTezbakeModuleConfiguration()
+	configuration := getDefaultMavbakeModuleConfiguration()
 	err := hjson.Unmarshal(rawConfiguration, configuration)
 	if err != nil {
-		slog.Error("failed to parse tezbake module configuration", "error", err.Error())
+		slog.Error("failed to parse mavbake module configuration", "error", err.Error())
 		return false, nil
 	}
 
@@ -130,23 +116,23 @@ func (v *Runtime) GetTezbakeModuleConfiguration() (bool, *TezbakeModuleConfigura
 	configuration.Hydrate()
 
 	if err := configuration.Validate(); err != nil {
-		slog.Error("failed to validate tezbake module configuration", "error", err.Error())
+		slog.Error("failed to validate mavbake module configuration", "error", err.Error())
 		return false, nil
 	}
 
 	return true, configuration
 }
 
-func (v *Runtime) GetTezpayModuleConfiguration() (bool, *TezpayModuleConfiguration) {
-	rawConfiguration, ok := v.Modules[constants.TEZPAY_MODULE_ID]
+func (v *Runtime) GetMavpayModuleConfiguration() (bool, *MavpayModuleConfiguration) {
+	rawConfiguration, ok := v.Modules[constants.MAVPAY_MODULE_ID]
 	if !ok {
 		return false, nil
 	}
 
-	configuration := getDefaultTezpayModuleConfiguration()
+	configuration := getDefaultMavpayModuleConfiguration()
 	err := hjson.Unmarshal(rawConfiguration, configuration)
 	if err != nil {
-		slog.Error("failed to parse tezpay module configuration", "error", err.Error())
+		slog.Error("failed to parse mavpay module configuration", "error", err.Error())
 		return false, nil
 	}
 
@@ -163,7 +149,7 @@ func (v *Runtime) GetTezpayModuleConfiguration() (bool, *TezpayModuleConfigurati
 	configuration.Hydrate()
 
 	if err := configuration.Validate(); err != nil {
-		slog.Error("failed to validate tezpay module configuration", "error", err.Error())
+		slog.Error("failed to validate mavpay module configuration", "error", err.Error())
 		return false, nil
 	}
 
@@ -193,12 +179,10 @@ func (r *Runtime) Hydrate() *Runtime {
 	}
 
 	if len(r.Nodes) == 0 {
-		r.Nodes = map[string]TezosNode{
+		r.Nodes = map[string]MavrykNode{
 			"baker":  BAKER_NODE,
-			"TzC-EU": TZC_EU_RPC,
-			"TzC-US": TZC_US_RPC,
-			"TF":     TF_RPC,
-			"TZKT":   TZKT_RPC,
+			"MVD":     MVD_RPC,
+			"MVKT":   MVKT_RPC,
 		}
 	}
 
@@ -207,7 +191,7 @@ func (r *Runtime) Hydrate() *Runtime {
 
 func Load() (*Runtime, error) {
 	var err error
-	configFilePath := os.Getenv(constants.ENV_TEZPEAK_CONFIG_FILE)
+	configFilePath := os.Getenv(constants.ENV_MAVPEAK_CONFIG_FILE)
 	if configFilePath == "" {
 		configFilePath = "config.hjson"
 	}

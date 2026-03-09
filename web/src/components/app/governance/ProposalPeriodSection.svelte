@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {
-		AGORA_PROPOSAL_URL,
+		PROPOSAL_PROPOSAL_URL,
 		EXPLORER_URL,
 		PROPOSAL_PERIOD_QUORUM_PERCENTAGE
 	} from '@src/common/constants';
@@ -30,8 +30,8 @@
 		window.open(`${EXPLORER_URL}/${id}`, '_blank');
 	}
 
-	function open_agora(id: string) {
-		window.open(`${AGORA_PROPOSAL_URL}/${id}/${periodIndex}`, '_blank');
+	function open_proposals(id: string) {
+		window.open(`${PROPOSAL_PROPOSAL_URL}/${id}/${periodIndex}`, '_blank');
 	}
 
 	async function upvote(proposal: string) {
@@ -107,9 +107,9 @@
 							<div class="icon"><SearchIcon /></div>
 						</div>
 					</Button>
-					<Button on:click={() => open_agora(proposal.proposal)}>
+					<Button on:click={() => open_proposals(proposal.proposal)}>
 						<div class="button-content">
-							<div class="label">AGORA</div>
+							<div class="label">PROPOSAL</div>
 							<div class="icon"><BookOpenIcon /></div>
 						</div>
 					</Button>

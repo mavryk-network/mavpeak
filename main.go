@@ -12,10 +12,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/tez-capital/tezpeak/core"
-	"github.com/tez-capital/tezpeak/util"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/mavpeak/core"
+	"github.com/mavryk-network/mavpeak/util"
 )
 
 type Message struct {
@@ -31,7 +31,7 @@ type staticFs struct {
 
 func (c staticFs) Open(name string) (http.File, error) {
 	// try to open .html file first, because filesystem middleware forbids to open folders
-	// but we want to provide html if it exists when user tries to access path like /tezpay
+	// but we want to provide html if it exists when user tries to access path like /mavpay
 	f, err := c.FileSystem.Open(name + ".html")
 	if err != nil {
 		return c.FileSystem.Open(name)
@@ -58,7 +58,7 @@ func main() {
 	}
 
 	if *versionFlag {
-		fmt.Printf("tezpeak %s - %s \n", constants.TEZPEAK_VERSION, constants.TEZPEAK_CODENAME)
+		fmt.Printf("mavpeak %s - %s \n", constants.MAVPEAK_VERSION, constants.MAVPEAK_CODENAME)
 		return
 	}
 
@@ -71,7 +71,7 @@ func main() {
 	// // 11695267
 	// // tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE
 	// common.StartNodeStatusProviders(context.Background(), config.Nodes, nil)
-	// fmt.Println(tezbake.GetBlockRightsFor(context.Background(), 11695742, []string{"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM"}))
+	// fmt.Println(mavbake.GetBlockRightsFor(context.Background(), 11695742, []string{"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM"}))
 	// os.Exit(0)
 
 	app := fiber.New()

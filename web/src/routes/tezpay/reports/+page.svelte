@@ -7,7 +7,7 @@
 	import BackIcon from '@components/la/icons/angle-left-solid.svelte';
 	import ProgressBar from '@src/components/starlight/components/ProgressBar.svelte';
 	import { onMount } from 'svelte';
-	import { listReports } from '@src/app/tezpay/client';
+	import { listReports } from '@src/app/mavpay/client';
 
 	let reports: Array<string> = [];
 	let dryRunReports: Array<string> = [];
@@ -34,7 +34,7 @@
 
 <div class="reports-wrap">
 	<div class="navigation-wrap">
-		<Button on:click={() => goto('/tezpay')}>
+		<Button on:click={() => goto('/mavpay')}>
 			<div class="navigation-btn-content"><BackIcon /> BACK</div>
 		</Button>
 		<Button on:click={() => goto('/')}>
@@ -56,7 +56,7 @@
 						<div class="no-data">NO DATA</div>
 					{:else}
 						{#each sortedReports as report}
-							<Button label={report} on:click={() => goto(`/tezpay/reports/${report}`)} />
+							<Button label={report} on:click={() => goto(`/mavpay/reports/${report}`)} />
 						{/each}
 					{/if}
 				</div>
@@ -70,7 +70,7 @@
 						<div class="no-data">NO DATA</div>
 					{:else}
 						{#each sortedDryRunReports as report}
-							<Button label={report} on:click={() => goto(`/tezpay/reports/${report}?dry=true`)} />
+							<Button label={report} on:click={() => goto(`/mavpay/reports/${report}?dry=true`)} />
 						{/each}
 					{/if}
 				</div>

@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { nodes } from '@app/state/index';
 	import {
-		state as tezbakeStatus,
-		bakers as tezbakeBakers,
-		services as tezbakeServices,
-		wallets as tezbakeWallets,
+		state as mavbakeStatus,
+		bakers as mavbakeBakers,
+		services as mavbakeServices,
+		wallets as mavbakeWallets,
 		futureBakingRights,
 		pastBakingRights,
 		votingPeriodInfo
-	} from '@app/state/tezbake';
-	import { state as tezpayStatus } from '@app/state/tezpay';
+	} from '@app/state/mavbake';
+	import { state as mavpayStatus } from '@app/state/mavpay';
 	import NodeStatusCard from '@components/app/NodeStatusCard.svelte';
 	import BakerStatusCard from '@components/app/BakerStatusCard.svelte';
 	import BakerRightsCard from '@components/app/BakerRightsCard.svelte';
@@ -19,33 +19,33 @@
 	import PayoutsCard from '@src/components/app/PayoutsCard.svelte';
 	import LedgerStatusCard from '@src/components/app/LedgerStatusCard.svelte';
 
-	$: showBakerColors = $tezbakeBakers.length > 1;
-	$: expandedBakingRights = $tezbakeBakers.length > 1;
+	$: showBakerColors = $mavbakeBakers.length > 1;
+	$: expandedBakingRights = $mavbakeBakers.length > 1;
 </script>
 
 <div class="dashboard-grid-wrap">
 	<div class="dashboard-grid">
-		{#if $tezbakeStatus}
-			{#each $tezbakeBakers as [baker, info]}
+		{#if $mavbakeStatus}
+			{#each $mavbakeBakers as [baker, info]}
 				<BakerStatusCard baker={baker ?? {}} status={info} showColor={showBakerColors} />
 			{/each}
-			{#each $tezbakeWallets as [walletId, info]}
+			{#each $mavbakeWallets as [walletId, info]}
 				<LedgerStatusCard id={walletId.toUpperCase()} {info} />
 			{/each}
 		{/if}
-		{#if $tezpayStatus}
+		{#if $mavpayStatus}
 			<PayoutsCard />
 		{/if}
-		{#if $tezbakeStatus}
+		{#if $mavbakeStatus}
 			<GovernancePeriodCard votingPeriodInfo={$votingPeriodInfo} />
 		{/if}
-		{#if Object.keys($tezbakeServices.applications ?? {}).length > 0}
-			<ServicesStatusCard title="Baker's Services" services={$tezbakeServices} />
+		{#if Object.keys($mavbakeServices.applications ?? {}).length > 0}
+			<ServicesStatusCard title="Baker's Services" services={$mavbakeServices} />
 		{/if}
 		{#each $nodes as [node, info]}
 			<NodeStatusCard node={info} title={node} />
 		{/each}
-		{#if $tezbakeStatus}
+		{#if $mavbakeStatus}
 			<div class="baker-rights" class:expanded={expandedBakingRights}>
 				<BakerRightsCard
 					mode="upcoming"

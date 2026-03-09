@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/trilitech/tzgo/rpc"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 type NodeNetworkInfo struct {
@@ -41,7 +41,7 @@ func (s *NodeStatusUpdate) GetData() any {
 }
 
 type ActiveRpcNode struct {
-	configuration.TezosNode
+	configuration.MavrykNode
 	*rpc.Client
 }
 
@@ -69,7 +69,7 @@ func updateNetworkInfo(ctx context.Context, client *rpc.Client, nodeStatus *Node
 
 }
 
-func StartNodeStatusProviders(ctx context.Context, nodes map[string]configuration.TezosNode, statusChannel chan<- StatusUpdate) {
+func StartNodeStatusProviders(ctx context.Context, nodes map[string]configuration.MavrykNode, statusChannel chan<- StatusUpdate) {
 	for nodeId, node := range nodes {
 		if _, ok := activeRpcNodes[nodeId]; ok {
 			slog.Warn("node already active", "source", node.Address, "id", nodeId)
@@ -82,7 +82,7 @@ func StartNodeStatusProviders(ctx context.Context, nodes map[string]configuratio
 		}
 
 		activeRpcNodes[nodeId] = &ActiveRpcNode{
-			TezosNode: node,
+			MavrykNode: node,
 			Client:    client,
 		}
 

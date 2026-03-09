@@ -3,7 +3,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Button from '@components/starlight/components/Button.svelte';
-	import { TEZPEAK_VERSION, TEZPEAK_CODENAME } from '@src/common/constants';
+	import { MAVPEAK_VERSION, MAVPEAK_CODENAME } from '@src/common/constants';
 	import { DiscordIcon, TwitterIcon, TelegramIcon } from '@src/components/app/icons';
 </script>
 
@@ -102,19 +102,19 @@
 				</g>
 			</svg>
 		</div>
-		<h2 class="title">TEZPEAK</h2>
+		<h2 class="title">MAVPEAK</h2>
 		<h5 class="version not-selectable">
-			{TEZPEAK_VERSION}
-			{TEZPEAK_CODENAME}
+			{MAVPEAK_VERSION}
+			{MAVPEAK_CODENAME}
 		</h5>
 		<div class="social">
 			<a class="svg-icon" href="https://discord.gg/2PnCr62YgF" target="_blank" rel="noreferrer">
 				<DiscordIcon />
 			</a>
-			<a class="svg-icon" href="https://twitter.com/TezCapital" target="_blank" rel="noreferrer">
+			<a class="svg-icon" href="https://x.com/MavrykDynamics" target="_blank" rel="noreferrer">
 				<TwitterIcon />
 			</a>
-			<a class="svg-icon" href="https://t.me/tezcapital" target="_blank" rel="noreferrer">
+			<a class="svg-icon" href="https://t.me/MavrykNetwork" target="_blank" rel="noreferrer">
 				<TelegramIcon />
 			</a>
 		</div>

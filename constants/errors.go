@@ -13,7 +13,7 @@ var (
 	ErrInvalidNodes            = errors.New("invalid nodes")
 	ErrNoValidBakers           = errors.New("no valid bakers")
 	ErrInvalidPayoutWallet     = errors.New("invalid payout wallet")
-	ErrNoTezpayAppPath         = errors.New("no tezpay app path")
+	ErrNoMavpayAppPath         = errors.New("no mavpay app path")
 
 	ErrFailedToSignOperation      = errors.New("failed to sign operation")
 	ErrFailedToCompleteOperation  = errors.New("failed to complete operation")

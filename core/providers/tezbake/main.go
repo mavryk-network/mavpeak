@@ -1,4 +1,4 @@
-package tezbake
+package mavbake
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/tez-capital/tezbake/apps/base"
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavbake/apps/base"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/core/common"
 )
 
 type Status struct {
@@ -55,59 +55,59 @@ type StatusUpdate struct {
 }
 
 func (statusUpdate *StatusUpdate) GetId() string {
-	return "tezbake"
+	return "mavbake"
 }
 
 func (statusUpdate *StatusUpdate) GetData() any {
 	return statusUpdate.Status
 }
 
-func SetupModule(ctx context.Context, configuration *configuration.TezbakeModuleConfiguration, app *fiber.Group, statusChannel chan<- common.StatusUpdate) error {
+func SetupModule(ctx context.Context, configuration *configuration.MavbakeModuleConfiguration, app *fiber.Group, statusChannel chan<- common.StatusUpdate) error {
 	err := setupGovernanceProvider(configuration, app)
 	if err != nil {
 		return err
 	}
 
-	tezbakeStatus := GetEmptyStatus()
-	tezbakeStatusChannel := make(chan common.StatusUpdate, 100)
+	mavbakeStatus := GetEmptyStatus()
+	mavbakeStatusChannel := make(chan common.StatusUpdate, 100)
 
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case statusUpdate := <-tezbakeStatusChannel:
+			case statusUpdate := <-mavbakeStatusChannel:
 				switch statusUpdate := statusUpdate.(type) {
 				case *common.ServicesStatusUpdate:
 					application := statusUpdate.Application
-					tezbakeStatus.Services.Applications[application] = statusUpdate.Status
-					tezbakeStatus.Services.Timestamp = time.Now().Unix()
+					mavbakeStatus.Services.Applications[application] = statusUpdate.Status
+					mavbakeStatus.Services.Timestamp = time.Now().Unix()
 				case *RightsStatusUpdate:
-					tezbakeStatus.Rights = statusUpdate.RightsStatus
+					mavbakeStatus.Rights = statusUpdate.RightsStatus
 				case *BakersStatusUpdate:
-					tezbakeStatus.Bakers = statusUpdate.BakersStatus
+					mavbakeStatus.Bakers = statusUpdate.BakersStatus
 				case *WalletsStatusUpdate:
-					tezbakeStatus.Wallets = statusUpdate.WalletsStatus
-					slog.Info("Ledger status updated", "wallets", len(tezbakeStatus.Wallets), "status", tezbakeStatus.Wallets)
+					mavbakeStatus.Wallets = statusUpdate.WalletsStatus
+					slog.Info("Ledger status updated", "wallets", len(mavbakeStatus.Wallets), "status", mavbakeStatus.Wallets)
 					// case *LedgerStatusUpdate:
 					// TODO: LedgerStatusUpdate
 				}
 
 				statusChannel <- &StatusUpdate{
-					Status: tezbakeStatus.Clone(),
+					Status: mavbakeStatus.Clone(),
 				}
 			}
 		}
 	}()
 
 	if configuration.RightsBlockWindow > 1 {
-		startRightsStatusProviders(ctx, configuration.Bakers, configuration.RightsBlockWindow, tezbakeStatusChannel)
+		startRightsStatusProviders(ctx, configuration.Bakers, configuration.RightsBlockWindow, mavbakeStatusChannel)
 	}
-	setupBakerStatusProviders(ctx, configuration.Bakers, tezbakeStatusChannel)
+	setupBakerStatusProviders(ctx, configuration.Bakers, mavbakeStatusChannel)
 	if configuration.ArcBinaryPath != "" {
-		startWalletsStatusProvider(ctx, configuration.Applications["signer"], configuration.ArcBinaryPath, configuration.LedgerWallets, tezbakeStatusChannel)
+		startWalletsStatusProvider(ctx, configuration.Applications["signer"], configuration.ArcBinaryPath, configuration.LedgerWallets, mavbakeStatusChannel)
 	}
-	common.StartServiceStatusProviders(ctx, configuration.Applications, tezbakeStatusChannel)
+	common.StartServiceStatusProviders(ctx, configuration.Applications, mavbakeStatusChannel)
 
 	return nil
 }

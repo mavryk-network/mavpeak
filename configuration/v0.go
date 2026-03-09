@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezpeak/constants"
+	"github.com/mavryk-network/mavpeak/constants"
 )
 
 type v0 struct {
@@ -16,7 +16,7 @@ type v0 struct {
 
 	Modules map[string]json.RawMessage `json:"modules,omitempty"`
 
-	Nodes map[string]TezosNode `json:"nodes,omitempty"`
+	Nodes map[string]MavrykNode `json:"nodes,omitempty"`
 }
 
 func getDefault_v0() *v0 {

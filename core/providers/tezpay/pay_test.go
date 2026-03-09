@@ -1,13 +1,13 @@
-package tezpay
+package mavpay
 
 import (
 	"encoding/json"
 
-	"github.com/tez-capital/tezpay/common"
+	"github.com/mavryk-network/mavpay/common"
 )
 
 const (
-	tezpayHome = "/mnt/c/Users/SD/Projects/tez.capital/peak/tezpay"
+	mavpayHome = "/mnt/c/Users/SD/Projects/mavrykdynamics/peak/mavpay"
 )
 
 type generatePayoutResult struct {
@@ -25,14 +25,14 @@ func getGeneratePayoutsResult(message string) (*generatePayoutResult, error) {
 // 	assert := assert.New(t)
 
 // 	config := configuration.Runtime{
-// 		TezpayHome: tezpayHome,
+// 		MavpayHome: mavpayHome,
 // 	}
 
-// 	tezpayProvider, err := NewTezpayProvider(&config)
+// 	mavpayProvider, err := NewMavpayProvider(&config)
 // 	assert.Nil(err)
 
 // 	outputChannel := make(chan string)
-// 	go tezpayProvider.GeneratePayouts(-1, outputChannel)
+// 	go mavpayProvider.GeneratePayouts(-1, outputChannel)
 
 // 	phases := []string{}
 // 	type message struct {
@@ -60,16 +60,16 @@ func getGeneratePayoutsResult(message string) (*generatePayoutResult, error) {
 // 	assert := assert.New(t)
 
 // 	config := configuration.Runtime{
-// 		TezpayHome: tezpayHome,
+// 		MavpayHome: mavpayHome,
 // 	}
 
-// 	assert.Nil(os.RemoveAll(path.Join(tezpayHome, "reports")))
+// 	assert.Nil(os.RemoveAll(path.Join(mavpayHome, "reports")))
 
-// 	tezpayProvider, err := NewTezpayProvider(&config)
+// 	mavpayProvider, err := NewMavpayProvider(&config)
 // 	assert.Nil(err)
 
 // 	outputChannel := make(chan string)
-// 	go tezpayProvider.GeneratePayouts(-1, outputChannel)
+// 	go mavpayProvider.GeneratePayouts(-1, outputChannel)
 
 // 	phases := []string{}
 // 	type message struct {
@@ -100,7 +100,7 @@ func getGeneratePayoutsResult(message string) (*generatePayoutResult, error) {
 // 	assert.Contains(phases, "execution_finished")
 
 // 	outputChannel = make(chan string)
-// 	go tezpayProvider.Pay(&resultMessage.CyclePayoutBlueprint, outputChannel)
+// 	go mavpayProvider.Pay(&resultMessage.CyclePayoutBlueprint, outputChannel)
 
 // 	phases = []string{}
 // 	for output := range outputChannel {
@@ -121,24 +121,24 @@ func getGeneratePayoutsResult(message string) (*generatePayoutResult, error) {
 
 // 	config := configuration.Runtime{
 // 		Modules: map[string]json.RawMessage{
-// 			"tezpay": json.RawMessage(`{
-// 				"app_path": "tezpay"
+// 			"mavpay": json.RawMessage(`{
+// 				"app_path": "mavpay"
 // 			}`),
 // 		},
 // 	}
 
-// 	err := setupTezpayProvider(&config, nil)
+// 	err := setupMavpayProvider(&config, nil)
 // 	assert.Nil(err)
 
-// 	ver, err := tezpayProvider.Version()
+// 	ver, err := mavpayProvider.Version()
 // 	assert.Nil(err)
 // 	assert.NotEmpty(ver)
-// 	assert.Contains(ver, "tezpay:")
-// 	assert.Contains(ver, "ami-tezpay:")
+// 	assert.Contains(ver, "mavpay:")
+// 	assert.Contains(ver, "ami-mavpay:")
 
-// 	// reports, err := tezpayProvider.ListDryReports()
+// 	// reports, err := mavpayProvider.ListDryReports()
 // 	// assert.Nil(err)
 // 	// assert.NotEmpty(reports)
 
-// 	// fmt.Println(tezpayProvider.GetReport("754", true))
+// 	// fmt.Println(mavpayProvider.GetReport("754", true))
 // }

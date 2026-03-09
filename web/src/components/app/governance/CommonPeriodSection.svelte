@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AGORA_PROPOSAL_URL, EXPLORER_URL } from '@src/common/constants';
+	import { PROPOSAL_PROPOSAL_URL, EXPLORER_URL } from '@src/common/constants';
 
 	import Button from '@src/components/starlight/components/Button.svelte';
 	import BookOpenIcon from '@src/components/la/icons/book-open-solid.svelte';
@@ -15,8 +15,8 @@
 		window.open(`${EXPLORER_URL}/${period.proposal}`, '_blank');
 	}
 
-	function open_agora() {
-		window.open(`${AGORA_PROPOSAL_URL}/${period.proposal}/${periodIndex}`, '_blank');
+	function open_proposals() {
+		window.open(`${PROPOSAL_PROPOSAL_URL}/${period.proposal}/${periodIndex}`, '_blank');
 	}
 </script>
 
@@ -37,9 +37,9 @@
 					<div class="icon"><SearchIcon /></div>
 				</div>
 			</Button>
-			<Button on:click={() => open_agora()}>
+			<Button on:click={() => open_proposals()}>
 				<div class="button-content">
-					<div class="label">AGORA</div>
+					<div class="label">PROPOSAL</div>
 					<div class="icon"><BookOpenIcon /></div>
 				</div>
 			</Button>

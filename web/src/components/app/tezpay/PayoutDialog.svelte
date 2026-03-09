@@ -5,7 +5,7 @@
 	import Button from '@components/starlight/components/Button.svelte';
 	import ProgressBar from '@components/starlight/components/ProgressBar.svelte';
 	import { DataTableSelectMode, type DataTableColumn } from '@components/starlight/types';
-	import { generatePayuts, executePayuts } from '@src/app/tezpay/client';
+	import { generatePayuts, executePayuts } from '@src/app/mavpay/client';
 	import { formatLogMessageForTerminal, type LogMessage } from '@src/util/log';
 	import { PHASE_MAPPING } from '@src/common/phases';
 	import type {
@@ -13,13 +13,13 @@
 		ExecutionResult,
 		PayoutBlueprint,
 		PayoutRecipe
-	} from '@src/common/types/tezpay';
+	} from '@src/common/types/mavpay';
 	import DataTable from '@src/components/starlight/components/DataTable.svelte';
 	import Expander from '@src/components/starlight/components/Expander.svelte';
 	import { formatAddress, formatBalance, formatPercentage } from '@src/util/format';
 	import { writeToClipboard } from '@src/util/clipboard';
 	import TimesSolid from '@src/components/la/icons/times-solid.svelte';
-	import { status } from '@src/app/state/tezbake';
+	import { status } from '@src/app/state/mavbake';
 
 	let terminal: Terminal;
 	let cycle: number | 'latest' = 0;

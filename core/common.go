@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavpeak/core/common"
 )
 
 type peakStatus struct {

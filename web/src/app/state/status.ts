@@ -1,9 +1,9 @@
 import { derived, type Readable } from "svelte/store"
 import { state, APP_CONNECTION_STATUS } from "."
-import { status as tezbakeStatus } from "./tezbake"
-import { status as tezpayStatus } from "./tezpay"
+import { status as mavbakeStatus } from "./mavbake"
+import { status as mavpayStatus } from "./mavpay"
 
-export const APP_STATUS_LEVEL = derived([state, APP_CONNECTION_STATUS, tezbakeStatus, tezpayStatus], ([$state, $connectionStatus, $tezbakeStatus, $tezpayStatus]) => {
+export const APP_STATUS_LEVEL = derived([state, APP_CONNECTION_STATUS, mavbakeStatus, mavpayStatus], ([$state, $connectionStatus, $mavbakeStatus, $mavpayStatus]) => {
 	if ($connectionStatus !== "connected") {
 		return "error"
 	}
@@ -13,12 +13,12 @@ export const APP_STATUS_LEVEL = derived([state, APP_CONNECTION_STATUS, tezbakeSt
 			return "error"
 		}
 	}
-	if ($tezbakeStatus !== "ok") {
-		return $tezbakeStatus
+	if ($mavbakeStatus !== "ok") {
+		return $mavbakeStatus
 	}
 
-	if ($tezpayStatus !== "ok") {
-		return $tezpayStatus
+	if ($mavpayStatus !== "ok") {
+		return $mavpayStatus
 	}
 
 	return "ok"

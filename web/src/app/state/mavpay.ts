@@ -3,8 +3,8 @@ import { state as globalState } from "."
 import type { PeakStatus } from "@src/common/types/status"
 
 export const state = derived(globalState, $state => {
-	return $state?.modules.tezpay
-}) as Readable<PeakStatus["modules"]["tezpay"]>
+	return $state?.modules.mavpay
+}) as Readable<PeakStatus["modules"]["mavpay"]>
 
 export const services = derived(state, $state => {
 	if ($state === undefined) {

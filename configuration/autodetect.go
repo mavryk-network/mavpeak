@@ -10,18 +10,18 @@ import (
 	"slices"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezbake/ami"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpeak/constants"
+	"github.com/mavryk-network/mavbake/ami"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpeak/constants"
 
-	signer_engines "github.com/tez-capital/tezpay/engines/signer"
-	"github.com/tez-capital/tezpay/state"
+	signer_engines "github.com/mavryk-network/mavpay/engines/signer"
+	"github.com/mavryk-network/mavpay/state"
 )
 
 /*
-	tezpay: {
+	mavpay: {
 		applications: {
-				tezpay: tezpay
+				mavpay: mavpay
 		}
 		payout_wallet: tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE
 		payout_wallet_preferences: {
@@ -30,38 +30,38 @@ import (
 		}
 	}
 */
-func autoDetectTezpayConfiguration(rootDir string) (json.RawMessage, error) {
+func autoDetectMavpayConfiguration(rootDir string) (json.RawMessage, error) {
 	if rootDir == "" {
 		return nil, errors.New("rootDir is empty")
 	}
 
-	workingDir := path.Join(rootDir, constants.DEFAULT_TEZPAY_APP_PATH)
+	workingDir := path.Join(rootDir, constants.DEFAULT_MAVPAY_APP_PATH)
 	if !ami.IsAppInstalled(workingDir) {
-		return nil, errors.New("tezpay not found, skipping")
+		return nil, errors.New("mavpay not found, skipping")
 	}
 
 	state.Init(workingDir, state.StateInitOptions{})
 
 	config, err := configuration.Load()
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to load tezpay configuration"), err)
+		return nil, errors.Join(errors.New("failed to load mavpay configuration"), err)
 	}
 
 	signerEngine := state.Global.SignerOverride
 	if signerEngine == nil {
 		signerEngine, err = signer_engines.Load(string(config.PayoutConfiguration.WalletMode))
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to to load tezpay signer"), err)
+			return nil, errors.Join(errors.New("failed to to load mavpay signer"), err)
 		}
 	}
 
-	slog.Info("Checking PKH used for tezpay payouts...")
+	slog.Info("Checking PKH used for mavpay payouts...")
 	pkh := signerEngine.GetPKH()
 
-	tezpayModuleConfiguration := &TezpayModuleConfiguration{
+	mavpayModuleConfiguration := &MavpayModuleConfiguration{
 		moduleConfigurationbase: moduleConfigurationbase{
 			Applications: map[string]string{
-				"tezpay": constants.DEFAULT_TEZPAY_APP_PATH,
+				"mavpay": constants.DEFAULT_MAVPAY_APP_PATH,
 			},
 		},
 		PayoutWallet: pkh.String(),
@@ -70,7 +70,7 @@ func autoDetectTezpayConfiguration(rootDir string) (json.RawMessage, error) {
 			BalanceErrorThreshold:   50,
 		},
 	}
-	return hjson.MarshalWithOptions(tezpayModuleConfiguration, hjson.DefaultOptions())
+	return hjson.MarshalWithOptions(mavpayModuleConfiguration, hjson.DefaultOptions())
 }
 
 /*
@@ -91,14 +91,14 @@ type nodeAppJsonPartial struct {
 }
 
 /*
-	tezbake: {
+	mavbake: {
 		bakers: [
 			tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM
 			tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE
 		]
 	}
 */
-func autoDetectTezbakeConfiguration(rootDir string) (json.RawMessage, error) {
+func autoDetectMavbakeConfiguration(rootDir string) (json.RawMessage, error) {
 	nodeAppPath := path.Join(rootDir, constants.DEFAULT_NODE_APP_PATH)
 	signerAppPath := path.Join(rootDir, constants.DEFAULT_SIGNER_APP_PATH)
 
@@ -135,7 +135,7 @@ func autoDetectTezbakeConfiguration(rootDir string) (json.RawMessage, error) {
 		}
 
 		// read pkhs based on aliases
-		pathToPkhs := path.Join(rootDir, constants.DEFAULT_NODE_APP_PATH, "data/.tezos-client/public_key_hashs")
+		pathToPkhs := path.Join(rootDir, constants.DEFAULT_NODE_APP_PATH, "data/.mavryk-client/public_key_hashs")
 		pkhs := nodePublicKeys{}
 		fileContent = []byte{}
 		if data, err := os.ReadFile(pathToPkhs); err == nil {
@@ -159,7 +159,7 @@ func autoDetectTezbakeConfiguration(rootDir string) (json.RawMessage, error) {
 		slog.Warn("Signer app is not found, skipping")
 	}
 
-	tezbakeModuleConfiguration := &TezbakeModuleConfiguration{
+	mavbakeModuleConfiguration := &MavbakeModuleConfiguration{
 		moduleConfigurationbase: moduleConfigurationbase{
 			Applications: applications,
 		},
@@ -168,7 +168,7 @@ func autoDetectTezbakeConfiguration(rootDir string) (json.RawMessage, error) {
 		Bakers:            bakers,
 	}
 
-	return hjson.MarshalWithOptions(tezbakeModuleConfiguration, hjson.DefaultOptions())
+	return hjson.MarshalWithOptions(mavbakeModuleConfiguration, hjson.DefaultOptions())
 }
 
 func AutoDetect(rootDir string, destinationFile string) {
@@ -180,18 +180,18 @@ func AutoDetect(rootDir string, destinationFile string) {
 		rootDir = absRootDir
 	}
 
-	tezpayConfig, err := autoDetectTezpayConfiguration(rootDir)
+	mavpayConfig, err := autoDetectMavpayConfiguration(rootDir)
 	if err != nil {
-		slog.Warn("Failed to auto-detect tezpay configuration", "error", err.Error())
+		slog.Warn("Failed to auto-detect mavpay configuration", "error", err.Error())
 	} else {
-		modules[constants.TEZPAY_MODULE_ID] = tezpayConfig
+		modules[constants.MAVPAY_MODULE_ID] = mavpayConfig
 	}
 
-	tezbakeConfig, err := autoDetectTezbakeConfiguration(rootDir)
+	mavbakeConfig, err := autoDetectMavbakeConfiguration(rootDir)
 	if err != nil {
-		slog.Warn("Failed to auto-detect tezbake configuration", "error", err.Error())
+		slog.Warn("Failed to auto-detect mavbake configuration", "error", err.Error())
 	} else {
-		modules[constants.TEZBAKE_MODULE_ID] = tezbakeConfig
+		modules[constants.MAVBAKE_MODULE_ID] = mavbakeConfig
 	}
 
 	config := Runtime{

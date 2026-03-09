@@ -1,12 +1,12 @@
-package tezpay
+package mavpay
 
 import (
 	"context"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/core/common"
 	"golang.org/x/exp/maps"
 )
 
@@ -30,7 +30,7 @@ type StatusUpdate struct {
 }
 
 func (statusUpdate *StatusUpdate) GetId() string {
-	return "tezbake"
+	return "mavbake"
 }
 
 func (statusUpdate *StatusUpdate) GetData() any {
@@ -46,39 +46,39 @@ func GetEmptyStatus() *Status {
 	}
 }
 
-func SetupModule(ctx context.Context, configuration *configuration.TezpayModuleConfiguration, app *fiber.Group, statusChannel chan<- common.StatusUpdate) error {
-	err := setupTezpayProvider(configuration, app)
+func SetupModule(ctx context.Context, configuration *configuration.MavpayModuleConfiguration, app *fiber.Group, statusChannel chan<- common.StatusUpdate) error {
+	err := setupMavpayProvider(configuration, app)
 	if err != nil {
 		return err
 	}
 
-	tezpayStatus := GetEmptyStatus()
-	tezpayStatusChannel := make(chan common.StatusUpdate, 100)
+	mavpayStatus := GetEmptyStatus()
+	mavpayStatusChannel := make(chan common.StatusUpdate, 100)
 
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case statusUpdate := <-tezpayStatusChannel:
+			case statusUpdate := <-mavpayStatusChannel:
 				switch statusUpdate := statusUpdate.(type) {
 				case *common.ServicesStatusUpdate:
 					application := statusUpdate.Application
-					tezpayStatus.Services.Applications[application] = statusUpdate.Status
-					tezpayStatus.Services.Timestamp = time.Now().Unix()
+					mavpayStatus.Services.Applications[application] = statusUpdate.Status
+					mavpayStatus.Services.Timestamp = time.Now().Unix()
 				case *WalletBalanceUpdate:
-					tezpayStatus.Wallet = statusUpdate.Status
+					mavpayStatus.Wallet = statusUpdate.Status
 				}
 
 				statusChannel <- &StatusUpdate{
-					Status: tezpayStatus.Clone(),
+					Status: mavpayStatus.Clone(),
 				}
 			}
 		}
 	}()
 
-	common.StartServiceStatusProviders(ctx, configuration.Applications, tezpayStatusChannel)
-	startWalletStatusProviders(ctx, configuration.PayoutWallet, configuration.PayoutWalletPreferences, tezpayStatusChannel)
+	common.StartServiceStatusProviders(ctx, configuration.Applications, mavpayStatusChannel)
+	startWalletStatusProviders(ctx, configuration.PayoutWallet, configuration.PayoutWalletPreferences, mavpayStatusChannel)
 
 	return nil
 }

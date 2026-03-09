@@ -39,8 +39,8 @@ export async function cast_vote(pkh: string, period: number, proposal: string, b
 }
 
 
-export function openTezgov() {
-	window.open('https://gov.tez.capital', '_blank');
+export function openMavgov() {
+	window.open('https://governance.mavryk.org', '_blank');
 }
 
 export async function waitConfirmation(opHash: string) {

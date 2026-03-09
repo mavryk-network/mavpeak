@@ -40,7 +40,7 @@
 		<slot />
 	</main>
 	<footer>
-		© {new Date().getFullYear()} tez.capital
+		© {new Date().getFullYear()} Mavryk Dynamics
 	</footer>
 </div>
 

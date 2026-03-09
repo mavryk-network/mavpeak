@@ -1,4 +1,4 @@
-module github.com/tez-capital/tezpeak
+module github.com/mavryk-network/mavpeak
 
 go 1.25.0
 
@@ -8,9 +8,9 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hjson/hjson-go/v4 v4.5.0
 	github.com/samber/lo v1.52.0
-	github.com/tez-capital/tezbake v0.0.0-20260124093547-833cdfe3603c
-	github.com/tez-capital/tezpay v0.0.0-20260124192412-02b7b5b18a44
-	github.com/trilitech/tzgo v1.24.1
+	github.com/mavryk-network/mavbake v0.0.0-20260124093547-833cdfe3603c
+	github.com/mavryk-network/mavpay v0.0.0-20260124192412-02b7b5b18a44
+	github.com/mavryk-network/gomavryk v1.24.1
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
 )
 

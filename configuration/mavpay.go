@@ -1,8 +1,8 @@
 package configuration
 
 import (
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type PayoutWalletPreferences struct {
@@ -10,7 +10,7 @@ type PayoutWalletPreferences struct {
 	BalanceErrorThreshold   int64 `json:"balance_error_threshold,omitempty"`
 }
 
-type TezpayModuleConfiguration struct {
+type MavpayModuleConfiguration struct {
 	moduleConfigurationbase
 
 	PayoutWallet            string                  `json:"payout_wallet,omitempty"`
@@ -18,27 +18,27 @@ type TezpayModuleConfiguration struct {
 	ForceDryRun             bool                    `json:"force_dry_run,omitempty"`
 }
 
-func getDefaultTezpayModuleConfiguration() *TezpayModuleConfiguration {
-	return &TezpayModuleConfiguration{
+func getDefaultMavpayModuleConfiguration() *MavpayModuleConfiguration {
+	return &MavpayModuleConfiguration{
 		moduleConfigurationbase: moduleConfigurationbase{
 			Applications: map[string]string{
-				"tezpay": constants.DEFAULT_TEZPAY_APP_PATH,
+				"mavpay": constants.DEFAULT_MAVPAY_APP_PATH,
 			},
 		},
 	}
 }
 
-func (c *TezpayModuleConfiguration) Hydrate() {
+func (c *MavpayModuleConfiguration) Hydrate() {
 
 }
 
-func (c *TezpayModuleConfiguration) Validate() error {
-	if _, err := tezos.ParseAddress(c.PayoutWallet); err != nil {
+func (c *MavpayModuleConfiguration) Validate() error {
+	if _, err := mavryk.ParseAddress(c.PayoutWallet); err != nil {
 		return constants.ErrInvalidPayoutWallet
 	}
 
-	if tezpayAppPath, ok := c.Applications["tezpay"]; !ok || tezpayAppPath == "" {
-		return constants.ErrNoTezpayAppPath
+	if mavpayAppPath, ok := c.Applications["mavpay"]; !ok || mavpayAppPath == "" {
+		return constants.ErrNoMavpayAppPath
 	}
 
 	return nil

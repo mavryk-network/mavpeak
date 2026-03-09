@@ -1,13 +1,13 @@
-package tezpay
+package mavpay
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/core/common"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/core/common"
+	"github.com/mavryk-network/gomavryk/rpc"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type WalletStatus struct {
@@ -61,7 +61,7 @@ func startWalletStatusProviders(ctx context.Context, wallet string, preferences 
 				}
 
 				balance, err := common.AttemptWithRpcClients(ctx, func(client *common.ActiveRpcNode) (int64, error) {
-					balance, err := client.GetContractBalance(ctx, tezos.MustParseAddress(wallet), rpc.Head)
+					balance, err := client.GetContractBalance(ctx, mavryk.MustParseAddress(wallet), rpc.Head)
 					if err != nil {
 						return 0, err
 					}
@@ -79,9 +79,9 @@ func startWalletStatusProviders(ctx context.Context, wallet string, preferences 
 
 				status.Balance = balance
 				switch {
-				case status.Balance < (preferences.BalanceErrorThreshold * 1000000) /* mutez */ :
+				case status.Balance < (preferences.BalanceErrorThreshold * 1000000) /* mumav */ :
 					status.Level = "error"
-				case status.Balance < (preferences.BalanceWarningThreshold * 1000000) /* mutez */ :
+				case status.Balance < (preferences.BalanceWarningThreshold * 1000000) /* mumav */ :
 					status.Level = "warning"
 				default:
 					status.Level = "ok"

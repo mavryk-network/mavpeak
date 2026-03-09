@@ -7,28 +7,28 @@
 	import TerminalDialog from '@components/starlight/dialogs/Terminal.svelte';
 	import ConfirmDialog from '@components/starlight/dialogs/Confirm.svelte';
 
-	import ManualCard from '@src/components/app/tezpay/ManualCard.svelte';
-	import TestCard from '@src/components/app/tezpay/TestCard.svelte';
-	import InfoCard from '@src/components/app/tezpay/InfoCard.svelte';
-	import PayoutDialog from '@components/app/tezpay/PayoutDialog.svelte';
+	import ManualCard from '@src/components/app/mavpay/ManualCard.svelte';
+	import TestCard from '@src/components/app/mavpay/TestCard.svelte';
+	import InfoCard from '@src/components/app/mavpay/InfoCard.svelte';
+	import PayoutDialog from '@components/app/mavpay/PayoutDialog.svelte';
 	import HomeIcon from '@components/la/icons/home-solid.svelte';
 	import ScrollIcon from '@components/la/icons/scroll-solid.svelte';
 	import {
 		disableContinual,
 		enableContinual,
-		getTezpayInfo,
+		getMavpayInfo,
 		startContinual,
 		stopContinual,
 		testExtensions,
 		testNotify
-	} from '@src/app/tezpay/client';
+	} from '@src/app/mavpay/client';
 
 	import { onMount } from 'svelte';
-	import { EmptyTezpayInfo, type TezpayInfo } from '@src/common/types/tezpay';
+	import { EmptyMavpayInfo, type MavpayInfo } from '@src/common/types/mavpay';
 	import { formatLogMessageForTerminal } from '@src/util/log';
 	import { USER_CANCELED } from '@src/components/starlight/src/constants';
 
-	let info: TezpayInfo = EmptyTezpayInfo;
+	let info: MavpayInfo = EmptyMavpayInfo;
 	let payoutDialog: PayoutDialog;
 	let alertDialog: AlertDialog;
 	let progressDialog: ProgressDialog;
@@ -37,7 +37,7 @@
 	let confirmDialog: ConfirmDialog;
 
 	onMount(async () => {
-		info = await getTezpayInfo();
+		info = await getMavpayInfo();
 		//payoutDialog.generate('latest');
 	});
 
@@ -119,7 +119,7 @@
 	}
 
 	async function test_notify() {
-		const { configuration } = await getTezpayInfo();
+		const { configuration } = await getMavpayInfo();
 		const notificators = new Set((configuration?.notifications ?? []).map((x) => x.type));
 
 		const result = await selectDialog.prompt({
@@ -165,7 +165,7 @@
 			<div class="navigation-btn-content"><HomeIcon /> HOME</div>
 		</Button>
 		<div />
-		<Button on:click={() => goto('/tezpay/reports')}>
+		<Button on:click={() => goto('/mavpay/reports')}>
 			<div class="navigation-btn-content"><ScrollIcon /> REPORTS</div>
 		</Button>
 	</div>

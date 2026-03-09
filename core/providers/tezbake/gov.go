@@ -1,4 +1,4 @@
-package tezbake
+package mavbake
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpeak/configuration"
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/tez-capital/tezpeak/core/common"
-	"github.com/tez-capital/tezpeak/util"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/signer/remote"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpeak/configuration"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/mavpeak/core/common"
+	"github.com/mavryk-network/mavpeak/util"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/rpc"
+	"github.com/mavryk-network/gomavryk/signer/remote"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type GovernanceStatus struct {
 }
 
 type GovernanceProvider struct {
-	configuration *configuration.TezbakeModuleConfiguration
+	configuration *configuration.MavbakeModuleConfiguration
 
 	signerUrl string
 }
@@ -34,7 +34,7 @@ type GovernancePeriodDetail struct {
 	Info      *rpc.VotingPeriodInfo `json:"info"`
 	Voters    rpc.VoterList         `json:"voters"`
 	Summary   *rpc.BallotSummary    `json:"summary"`
-	Proposal  tezos.ProtocolHash    `json:"proposal"`
+	Proposal  mavryk.ProtocolHash    `json:"proposal"`
 	Proposals rpc.ProposalList      `json:"proposals"`
 	Quorum    int                   `json:"quorum"`
 	Ballots   rpc.BallotList        `json:"ballots"`
@@ -42,8 +42,8 @@ type GovernancePeriodDetail struct {
 }
 
 type UpvoteParams struct {
-	Source    tezos.Address        `json:"source"`
-	Proposals []tezos.ProtocolHash `json:"proposals"`
+	Source    mavryk.Address        `json:"source"`
+	Proposals []mavryk.ProtocolHash `json:"proposals"`
 	Period    int32                `json:"period"`
 }
 
@@ -56,8 +56,8 @@ func (p *UpvoteParams) ToContents() codec.Operation {
 }
 
 type VoteParams struct {
-	Source   tezos.Address      `json:"source"`
-	Proposal tezos.ProtocolHash `json:"proposal"`
+	Source   mavryk.Address      `json:"source"`
+	Proposal mavryk.ProtocolHash `json:"proposal"`
 	Period   int32              `json:"period"`
 	Ballot   string             `json:"ballot"`
 }
@@ -67,7 +67,7 @@ func (p *VoteParams) ToContents() codec.Operation {
 		Source:   p.Source,
 		Proposal: p.Proposal,
 		Period:   p.Period,
-		Ballot:   tezos.ParseBallotVote(p.Ballot),
+		Ballot:   mavryk.ParseBallotVote(p.Ballot),
 	}
 }
 
@@ -201,10 +201,10 @@ func (governanceProvider *GovernanceProvider) startSummaryCollector(ctx context.
 
 func (governanceProvider *GovernanceProvider) startProtocolCollector(ctx context.Context, detail *GovernancePeriodDetail, wg *sync.WaitGroup) {
 	wrapInWaithGroup(wg, func() {
-		currentProposal, _ := attemptWithGovernanceRpcClients(ctx, func(client *common.ActiveRpcNode) (tezos.ProtocolHash, error) {
+		currentProposal, _ := attemptWithGovernanceRpcClients(ctx, func(client *common.ActiveRpcNode) (mavryk.ProtocolHash, error) {
 			proposal, err := client.GetVoteProposal(ctx, rpc.Head)
 			if err != nil {
-				return tezos.ProtocolHash{}, err
+				return mavryk.ProtocolHash{}, err
 			}
 			return proposal, err
 		})
@@ -237,12 +237,12 @@ func (governanceProvider *GovernanceProvider) GetGovernancePeriodDetail(ctx cont
 
 	governanceProvider.startVotersCollector(ctx, detail, &wg)
 
-	if periodInfo.VotingPeriod.Kind == tezos.VotingPeriodProposal {
+	if periodInfo.VotingPeriod.Kind == mavryk.VotingPeriodProposal {
 		governanceProvider.startProposalsCollector(ctx, detail, &wg)
 		governanceProvider.startVotesCollector(ctx, detail, &wg)
 	}
 
-	if periodInfo.VotingPeriod.Kind == tezos.VotingPeriodExploration || periodInfo.VotingPeriod.Kind == tezos.VotingPeriodPromotion {
+	if periodInfo.VotingPeriod.Kind == mavryk.VotingPeriodExploration || periodInfo.VotingPeriod.Kind == mavryk.VotingPeriodPromotion {
 		governanceProvider.startQuorumCollector(ctx, detail, &wg)
 		governanceProvider.startBallotsCollector(ctx, detail, &wg)
 		governanceProvider.startSummaryCollector(ctx, detail, &wg)
@@ -253,19 +253,19 @@ func (governanceProvider *GovernanceProvider) GetGovernancePeriodDetail(ctx cont
 	return detail, nil
 }
 
-func (governanceProvider *GovernanceProvider) buildAndBroadcastGovernanceOperation(ctx context.Context, pkh tezos.Address, contents codec.Operation) (tezos.OpHash, error) {
+func (governanceProvider *GovernanceProvider) buildAndBroadcastGovernanceOperation(ctx context.Context, pkh mavryk.Address, contents codec.Operation) (mavryk.OpHash, error) {
 	rs, err := remote.New(governanceProvider.signerUrl, nil)
 	if err != nil {
 		err = util.TryUnwrapRPCError(err)
 		slog.Error("failed to create remote signer", "error", err.Error())
-		return tezos.OpHash{}, errors.Join(constants.ErrFailedToCreateRemoteSigner, err)
+		return mavryk.OpHash{}, errors.Join(constants.ErrFailedToCreateRemoteSigner, err)
 	}
 
 	key, err := rs.GetKey(ctx, pkh)
 	if err != nil {
 		err = util.TryUnwrapRPCError(err)
 		slog.Error("failed to get key", "error", err.Error())
-		return tezos.OpHash{}, errors.Join(constants.ErrFailedToGetPublicKey, err)
+		return mavryk.OpHash{}, errors.Join(constants.ErrFailedToGetPublicKey, err)
 	}
 
 	// complete the operation
@@ -289,44 +289,44 @@ func (governanceProvider *GovernanceProvider) buildAndBroadcastGovernanceOperati
 	if err != nil {
 		err = util.TryUnwrapRPCError(err)
 		slog.Error("failed to complete operation", "error", err.Error())
-		return tezos.OpHash{}, errors.Join(constants.ErrFailedToCompleteOperation, err)
+		return mavryk.OpHash{}, errors.Join(constants.ErrFailedToCompleteOperation, err)
 	}
 
 	signature, err := rs.SignOperation(ctx, pkh, op)
 	if err != nil {
 		err = util.TryUnwrapRPCError(err)
 		slog.Error("failed to sign operation", "error", err.Error())
-		return tezos.OpHash{}, errors.Join(constants.ErrFailedToSignOperation, err)
+		return mavryk.OpHash{}, errors.Join(constants.ErrFailedToSignOperation, err)
 	}
 	op = op.WithSignature(signature)
 
-	opHash, err := attemptWithGovernanceRpcClients(ctx, func(client *common.ActiveRpcNode) (tezos.OpHash, error) {
+	opHash, err := attemptWithGovernanceRpcClients(ctx, func(client *common.ActiveRpcNode) (mavryk.OpHash, error) {
 		opHash, err := client.Broadcast(ctx, op)
 		if err != nil {
 			slog.Error("failed to broadcast operation", "error", err.Error())
-			return tezos.OpHash{}, err
+			return mavryk.OpHash{}, err
 		}
 		return opHash, err
 	})
 	if err != nil {
 		err = util.TryUnwrapRPCError(err)
 		slog.Error("failed to broadcast operation", "error", err.Error())
-		return tezos.OpHash{}, errors.Join(constants.ErrFailedToBroadcastOperation, err)
+		return mavryk.OpHash{}, errors.Join(constants.ErrFailedToBroadcastOperation, err)
 	}
 
 	return opHash, nil
 }
 
-func (governanceProvider *GovernanceProvider) Upvote(ctx context.Context, params *UpvoteParams) (tezos.OpHash, error) {
+func (governanceProvider *GovernanceProvider) Upvote(ctx context.Context, params *UpvoteParams) (mavryk.OpHash, error) {
 	return governanceProvider.buildAndBroadcastGovernanceOperation(ctx, params.Source, params.ToContents())
 }
 
-func (governanceProvider *GovernanceProvider) Vote(ctx context.Context, params *VoteParams) (tezos.OpHash, error) {
+func (governanceProvider *GovernanceProvider) Vote(ctx context.Context, params *VoteParams) (mavryk.OpHash, error) {
 	return governanceProvider.buildAndBroadcastGovernanceOperation(ctx, params.Source, params.ToContents())
 }
 
 func (governanceProvider *GovernanceProvider) WaitConfirmation(ctx context.Context, opHash string) (bool, error) {
-	op, err := tezos.ParseOpHash(opHash)
+	op, err := mavryk.ParseOpHash(opHash)
 	if err != nil {
 		return false, err
 	}
@@ -440,7 +440,7 @@ func (governanceProvider *GovernanceProvider) RegisterApi(app *fiber.Group) erro
 	return nil
 }
 
-func setupGovernanceProvider(configuration *configuration.TezbakeModuleConfiguration, app *fiber.Group) error {
+func setupGovernanceProvider(configuration *configuration.MavbakeModuleConfiguration, app *fiber.Group) error {
 	provider := &GovernanceProvider{
 		configuration: configuration,
 		signerUrl:     configuration.SignerUrl,

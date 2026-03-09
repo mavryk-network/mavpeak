@@ -1,4 +1,4 @@
-package tezpay
+package mavpay
 
 import (
 	"bufio"
@@ -15,43 +15,43 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezbake/apps"
-	"github.com/tez-capital/tezbake/apps/pay"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpeak/configuration"
-	peakCommon "github.com/tez-capital/tezpeak/core/common"
+	"github.com/mavryk-network/mavbake/apps"
+	"github.com/mavryk-network/mavbake/apps/pay"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpeak/configuration"
+	peakCommon "github.com/mavryk-network/mavpeak/core/common"
 )
 
-type TezpayProvider struct {
-	configuration *configuration.TezpayModuleConfiguration
+type MavpayProvider struct {
+	configuration *configuration.MavpayModuleConfiguration
 
-	tezpay *pay.Tezpay
+	mavpay *pay.Mavpay
 }
 
-type TezpayVersion struct {
-	AmiTezpay string `json:"ami-tezpay"`
-	Tezpay    string `json:"tezpay"`
+type MavpayVersion struct {
+	AmiMavpay string `json:"ami-mavpay"`
+	Mavpay    string `json:"mavpay"`
 }
 
-func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
-	app.Get("/tezpay/can-pay", func(c *fiber.Ctx) error {
-		return c.JSON(tezpayProvider.CanPay())
+func (mavpayProvider *MavpayProvider) RegisterApi(app *fiber.Group) error {
+	app.Get("/mavpay/can-pay", func(c *fiber.Ctx) error {
+		return c.JSON(mavpayProvider.CanPay())
 	})
 
-	app.Get("/tezpay/info", func(c *fiber.Ctx) error {
-		version, err := tezpayProvider.Version()
+	app.Get("/mavpay/info", func(c *fiber.Ctx) error {
+		version, err := mavpayProvider.Version()
 		if err != nil {
 			slog.Error("failed to get version", "error", err.Error())
 			version = "unknown"
 		}
 
-		var versions TezpayVersion
+		var versions MavpayVersion
 		err = hjson.Unmarshal([]byte(version), &versions)
 		if err != nil {
 			slog.Error("failed to parse version", "error", err.Error())
 		}
 
-		configurationString, err := tezpayProvider.GetTezpayConfiguration()
+		configurationString, err := mavpayProvider.GetMavpayConfiguration()
 		if err != nil {
 			slog.Error("failed to get configuration", "error", err.Error())
 			configurationString = "{}"
@@ -69,8 +69,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		})
 	})
 
-	app.Get("/tezpay/generate-payouts", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Get("/mavpay/generate-payouts", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
 
@@ -91,7 +91,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			outputChannel := make(chan string)
-			go tezpayProvider.GeneratePayouts(cycle, outputChannel)
+			go mavpayProvider.GeneratePayouts(cycle, outputChannel)
 
 			for output := range outputChannel {
 				fmt.Fprintf(w, "%v\n", output)
@@ -102,8 +102,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return nil
 	})
 
-	app.Post("/tezpay/pay", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Post("/mavpay/pay", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
 		c.Set("Content-Type", "text/event-stream")
@@ -121,7 +121,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			outputChannel := make(chan string)
-			go tezpayProvider.Pay(&blueprint, outputChannel, dry)
+			go mavpayProvider.Pay(&blueprint, outputChannel, dry)
 
 			for output := range outputChannel {
 				fmt.Fprintf(w, "%v\n", output)
@@ -132,7 +132,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return nil
 	})
 
-	app.Get("/tezpay/statistics", func(c *fiber.Ctx) error {
+	app.Get("/mavpay/statistics", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
 		c.Set("Connection", "keep-alive")
@@ -163,7 +163,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			outputChannel := make(chan string)
 
-			go tezpayProvider.Statistics(numberOfCycles, lastCycle, outputChannel)
+			go mavpayProvider.Statistics(numberOfCycles, lastCycle, outputChannel)
 
 			for output := range outputChannel {
 				fmt.Fprintf(w, "%v\n", output)
@@ -174,8 +174,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return nil
 	})
 
-	app.Post("/tezpay/test-notify", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Post("/mavpay/test-notify", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
 		c.Set("Content-Type", "text/event-stream")
@@ -188,7 +188,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			outputChannel := make(chan string)
 
-			go tezpayProvider.TestNotify(notificator, outputChannel)
+			go mavpayProvider.TestNotify(notificator, outputChannel)
 
 			for output := range outputChannel {
 				fmt.Fprintf(w, "%v\n", output)
@@ -198,8 +198,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return nil
 	})
 
-	app.Post("/tezpay/test-extensions", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Post("/mavpay/test-extensions", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
 		c.Set("Content-Type", "text/event-stream")
@@ -210,7 +210,7 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			outputChannel := make(chan string)
 
-			go tezpayProvider.TestExtensions(outputChannel)
+			go mavpayProvider.TestExtensions(outputChannel)
 
 			for output := range outputChannel {
 				fmt.Fprintf(w, "%v\n", output)
@@ -220,8 +220,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return nil
 	})
 
-	app.Get("/tezpay/list-reports", func(c *fiber.Ctx) error {
-		reports, err := tezpayProvider.ListReports(c.Query("dry") == "true")
+	app.Get("/mavpay/list-reports", func(c *fiber.Ctx) error {
+		reports, err := mavpayProvider.ListReports(c.Query("dry") == "true")
 		if err != nil {
 			slog.Error("failed to list reports", "error", err.Error())
 			return c.Status(500).SendString("failed to list reports")
@@ -230,8 +230,8 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return c.JSON(reports)
 	})
 
-	app.Get("/tezpay/report", func(c *fiber.Ctx) error {
-		report, err := tezpayProvider.GetReport(c.Query("id"), c.Query("dry") == "true")
+	app.Get("/mavpay/report", func(c *fiber.Ctx) error {
+		report, err := mavpayProvider.GetReport(c.Query("id"), c.Query("dry") == "true")
 		if err != nil {
 			slog.Error("failed to get report", "error", err.Error())
 			return c.Status(500).SendString("failed to get report")
@@ -240,11 +240,11 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return c.JSON(report)
 	})
 
-	app.Get("/tezpay/stop-continual", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Get("/mavpay/stop-continual", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
-		err := tezpayProvider.StopContinualPayouts()
+		err := mavpayProvider.StopContinualPayouts()
 		if err != nil {
 			slog.Error("failed to stop service", "error", err.Error())
 			return c.Status(500).SendString("failed to stop service: " + err.Error())
@@ -252,11 +252,11 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return c.Status(200).SendString("service stopped")
 	})
 
-	app.Get("/tezpay/start-continual", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Get("/mavpay/start-continual", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
-		err := tezpayProvider.StartContinualPayouts()
+		err := mavpayProvider.StartContinualPayouts()
 		if err != nil {
 			slog.Error("failed to start service", "error", err.Error())
 			return c.Status(500).SendString("failed to start service: " + err.Error())
@@ -264,11 +264,11 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return c.Status(200).SendString("service started")
 	})
 
-	app.Get("/tezpay/enable-continual", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Get("/mavpay/enable-continual", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
-		err := tezpayProvider.EnableContinualPayouts()
+		err := mavpayProvider.EnableContinualPayouts()
 		if err != nil {
 			slog.Error("failed to enable continual services", "error", err.Error())
 			return c.Status(500).SendString("failed to enable continual services: " + err.Error())
@@ -276,11 +276,11 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 		return c.Status(200).SendString("continual enabled")
 	})
 
-	app.Get("/tezpay/disable-continual", func(c *fiber.Ctx) error {
-		if !tezpayProvider.CanPay() {
+	app.Get("/mavpay/disable-continual", func(c *fiber.Ctx) error {
+		if !mavpayProvider.CanPay() {
 			return c.Status(fiber.StatusForbidden).SendString("not allowed")
 		}
-		err := tezpayProvider.DisableContinualPayouts()
+		err := mavpayProvider.DisableContinualPayouts()
 		if err != nil {
 			slog.Error("failed to disable continual services", "error", err.Error())
 			return c.Status(500).SendString("failed to disable continual services: " + err.Error())
@@ -291,19 +291,19 @@ func (tezpayProvider *TezpayProvider) RegisterApi(app *fiber.Group) error {
 	return nil
 }
 
-func setupTezpayProvider(configuration *configuration.TezpayModuleConfiguration, app *fiber.Group) error {
-	tezpayPath, ok := configuration.Applications["tezpay"]
+func setupMavpayProvider(configuration *configuration.MavpayModuleConfiguration, app *fiber.Group) error {
+	mavpayPath, ok := configuration.Applications["mavpay"]
 	if !ok {
-		return errors.New("tezpay path not found in configuration")
+		return errors.New("mavpay path not found in configuration")
 	}
 
-	tezpayProvider := &TezpayProvider{
+	mavpayProvider := &MavpayProvider{
 		configuration: configuration,
 
-		tezpay: apps.TezpayFromPath(tezpayPath),
+		mavpay: apps.MavpayFromPath(mavpayPath),
 	}
 
-	return tezpayProvider.RegisterApi(app)
+	return mavpayProvider.RegisterApi(app)
 }
 
 type ExecutionFinishedMessage struct {
@@ -328,14 +328,14 @@ func buildFinishMessage(exitCode int, err error) string {
 	return string(messageBytes)
 }
 
-func (t *TezpayProvider) GeneratePayouts(cycle int64, outputChannel chan<- string) {
+func (t *MavpayProvider) GeneratePayouts(cycle int64, outputChannel chan<- string) {
 	switch {
 	case cycle < 0:
-		exitcode, err := t.tezpay.ExecuteWithOutputChannel(outputChannel, "generate-payouts", "--output-format", "json")
+		exitcode, err := t.mavpay.ExecuteWithOutputChannel(outputChannel, "generate-payouts", "--output-format", "json")
 		outputChannel <- buildFinishMessage(exitcode, err)
 		close(outputChannel)
 	default:
-		exitCode, err := t.tezpay.ExecuteWithOutputChannel(outputChannel, "generate-payouts", "--cycle", fmt.Sprintf("%d", cycle))
+		exitCode, err := t.mavpay.ExecuteWithOutputChannel(outputChannel, "generate-payouts", "--cycle", fmt.Sprintf("%d", cycle))
 		outputChannel <- buildFinishMessage(exitCode, err)
 		close(outputChannel)
 	}
@@ -343,7 +343,7 @@ func (t *TezpayProvider) GeneratePayouts(cycle int64, outputChannel chan<- strin
 
 type CyclePayoutBlueprint common.CyclePayoutBlueprint
 
-func (t *TezpayProvider) Pay(blueprint *CyclePayoutBlueprint, outputChannel chan<- string, dry bool) {
+func (t *MavpayProvider) Pay(blueprint *CyclePayoutBlueprint, outputChannel chan<- string, dry bool) {
 	marshaledBlueprint, err := json.Marshal(blueprint)
 	if err != nil {
 		outputChannel <- buildFinishMessage(-1, err)
@@ -369,16 +369,16 @@ func (t *TezpayProvider) Pay(blueprint *CyclePayoutBlueprint, outputChannel chan
 
 	var exitcode int
 	if dry || t.configuration.ForceDryRun {
-		exitcode, err = t.tezpay.ExecuteWithOutputChannel(outputChannel, "pay", "--output-format", "json", "--from-file", filePath, "--confirm", "--disable-donation-prompt", "--dry-run")
+		exitcode, err = t.mavpay.ExecuteWithOutputChannel(outputChannel, "pay", "--output-format", "json", "--from-file", filePath, "--confirm", "--disable-donation-prompt", "--dry-run")
 	} else {
-		exitcode, err = t.tezpay.ExecuteWithOutputChannel(outputChannel, "pay", "--output-format", "json", "--from-file", filePath, "--confirm", "--disable-donation-prompt")
+		exitcode, err = t.mavpay.ExecuteWithOutputChannel(outputChannel, "pay", "--output-format", "json", "--from-file", filePath, "--confirm", "--disable-donation-prompt")
 	}
 	outputChannel <- buildFinishMessage(exitcode, err)
 	close(outputChannel)
 }
 
-func (t *TezpayProvider) Version() (string, error) {
-	output, exitCode, err := t.tezpay.ExecuteGetOutput("version")
+func (t *MavpayProvider) Version() (string, error) {
+	output, exitCode, err := t.mavpay.ExecuteGetOutput("version")
 	if err != nil {
 		slog.Error("failed to get version", "error", err.Error())
 		return "", err
@@ -390,7 +390,7 @@ func (t *TezpayProvider) Version() (string, error) {
 	return output, nil
 }
 
-func (t *TezpayProvider) Statistics(numberOfCycles, lastCycle int64, outputChannel chan<- string) {
+func (t *MavpayProvider) Statistics(numberOfCycles, lastCycle int64, outputChannel chan<- string) {
 	if numberOfCycles < 0 {
 		numberOfCycles = 10
 	}
@@ -398,25 +398,25 @@ func (t *TezpayProvider) Statistics(numberOfCycles, lastCycle int64, outputChann
 		lastCycle = 0
 	}
 
-	exitcode, err := t.tezpay.ExecuteWithOutputChannel(outputChannel, "tezpay", "--output-format", "json", "statistics", "--cycles", fmt.Sprintf("%d", numberOfCycles), "--last-cycle", fmt.Sprintf("%d", lastCycle))
+	exitcode, err := t.mavpay.ExecuteWithOutputChannel(outputChannel, "mavpay", "--output-format", "json", "statistics", "--cycles", fmt.Sprintf("%d", numberOfCycles), "--last-cycle", fmt.Sprintf("%d", lastCycle))
 	outputChannel <- buildFinishMessage(exitcode, err)
 	close(outputChannel)
 }
 
-func (t *TezpayProvider) TestNotify(notificator string, outputChannel chan<- string) {
+func (t *MavpayProvider) TestNotify(notificator string, outputChannel chan<- string) {
 	var exitcode int
 	var err error
 	if notificator == "" {
-		exitcode, err = t.tezpay.ExecuteWithOutputChannel(outputChannel, "tezpay", "--output-format", "json", "test-notify")
+		exitcode, err = t.mavpay.ExecuteWithOutputChannel(outputChannel, "mavpay", "--output-format", "json", "test-notify")
 	} else {
-		exitcode, err = t.tezpay.ExecuteWithOutputChannel(outputChannel, "tezpay", "--output-format", "json", "test-notify", "--notificator", notificator)
+		exitcode, err = t.mavpay.ExecuteWithOutputChannel(outputChannel, "mavpay", "--output-format", "json", "test-notify", "--notificator", notificator)
 	}
 	outputChannel <- buildFinishMessage(exitcode, err)
 	close(outputChannel)
 }
 
-func (t *TezpayProvider) TestExtensions(outputChannel chan<- string) {
-	exitcode, err := t.tezpay.ExecuteWithOutputChannel(outputChannel, "tezpay", "--output-format", "json", "test-extensions")
+func (t *MavpayProvider) TestExtensions(outputChannel chan<- string) {
+	exitcode, err := t.mavpay.ExecuteWithOutputChannel(outputChannel, "mavpay", "--output-format", "json", "test-extensions")
 	outputChannel <- buildFinishMessage(exitcode, err)
 	close(outputChannel)
 }
@@ -453,8 +453,8 @@ func listReportsInternal(reportsDirectoryPath string) ([]string, error) {
 	return acc, nil
 }
 
-func (t *TezpayProvider) ListReports(dry bool) ([]string, error) {
-	reportsDirectoryPath := path.Join(t.tezpay.GetPath(), "reports")
+func (t *MavpayProvider) ListReports(dry bool) ([]string, error) {
+	reportsDirectoryPath := path.Join(t.mavpay.GetPath(), "reports")
 	if dry {
 		reportsDirectoryPath = path.Join(reportsDirectoryPath, "dry")
 	}
@@ -468,8 +468,8 @@ type PayoutReport struct {
 	Invalid []common.PayoutReport     `json:"invalid"`
 }
 
-func (t *TezpayProvider) GetReport(reportName string, dry bool) (*PayoutReport, error) {
-	reportsDirectoryPath := path.Join(t.tezpay.GetPath(), "reports")
+func (t *MavpayProvider) GetReport(reportName string, dry bool) (*PayoutReport, error) {
+	reportsDirectoryPath := path.Join(t.mavpay.GetPath(), "reports")
 	if dry {
 		reportsDirectoryPath = path.Join(reportsDirectoryPath, "dry")
 	}
@@ -518,9 +518,9 @@ func (t *TezpayProvider) GetReport(reportName string, dry bool) (*PayoutReport, 
 	}, nil
 }
 
-func (t *TezpayProvider) StopContinualPayouts() error {
-	defer peakCommon.UpdateServiceStatus(t.tezpay.GetPath())
-	exitCode, err := t.tezpay.Stop()
+func (t *MavpayProvider) StopContinualPayouts() error {
+	defer peakCommon.UpdateServiceStatus(t.mavpay.GetPath())
+	exitCode, err := t.mavpay.Stop()
 	if err != nil {
 		return err
 	}
@@ -530,9 +530,9 @@ func (t *TezpayProvider) StopContinualPayouts() error {
 	return nil
 }
 
-func (t *TezpayProvider) StartContinualPayouts() error {
-	defer peakCommon.UpdateServiceStatus(t.tezpay.GetPath())
-	exitCode, err := t.tezpay.Start()
+func (t *MavpayProvider) StartContinualPayouts() error {
+	defer peakCommon.UpdateServiceStatus(t.mavpay.GetPath())
+	exitCode, err := t.mavpay.Start()
 	if err != nil {
 		return err
 	}
@@ -542,9 +542,9 @@ func (t *TezpayProvider) StartContinualPayouts() error {
 	return nil
 }
 
-func (t *TezpayProvider) DisableContinualPayouts() error {
-	defer peakCommon.UpdateServiceStatus(t.tezpay.GetPath())
-	exitCode, err := t.tezpay.Execute("continual", "--disable")
+func (t *MavpayProvider) DisableContinualPayouts() error {
+	defer peakCommon.UpdateServiceStatus(t.mavpay.GetPath())
+	exitCode, err := t.mavpay.Execute("continual", "--disable")
 	if err != nil {
 		return err
 	}
@@ -554,9 +554,9 @@ func (t *TezpayProvider) DisableContinualPayouts() error {
 	return nil
 }
 
-func (t *TezpayProvider) EnableContinualPayouts() error {
-	defer peakCommon.UpdateServiceStatus(t.tezpay.GetPath())
-	exitCode, err := t.tezpay.Execute("continual", "--enable")
+func (t *MavpayProvider) EnableContinualPayouts() error {
+	defer peakCommon.UpdateServiceStatus(t.mavpay.GetPath())
+	exitCode, err := t.mavpay.Execute("continual", "--enable")
 	if err != nil {
 		return err
 	}
@@ -566,8 +566,8 @@ func (t *TezpayProvider) EnableContinualPayouts() error {
 	return nil
 }
 
-func (t *TezpayProvider) GetTezpayConfiguration() (string, error) {
-	configurationFilePath := path.Join(t.tezpay.GetPath(), "config.hjson")
+func (t *MavpayProvider) GetMavpayConfiguration() (string, error) {
+	configurationFilePath := path.Join(t.mavpay.GetPath(), "config.hjson")
 	configurationBytes, err := os.ReadFile(configurationFilePath)
 	if err != nil {
 		return "{}", err
@@ -575,6 +575,6 @@ func (t *TezpayProvider) GetTezpayConfiguration() (string, error) {
 	return string(configurationBytes), nil
 }
 
-func (t *TezpayProvider) CanPay() bool {
+func (t *MavpayProvider) CanPay() bool {
 	return t.configuration.Mode == configuration.PrivatePeakMode
 }

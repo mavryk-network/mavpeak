@@ -10,11 +10,11 @@ import (
 	"strings"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezpeak/constants"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpeak/constants"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
-type TezbakeModuleConfiguration struct {
+type MavbakeModuleConfiguration struct {
 	moduleConfigurationbase
 
 	SignerUrl         string   `json:"signer_url"`
@@ -24,8 +24,8 @@ type TezbakeModuleConfiguration struct {
 	ArcBinaryPath     string   `json:"arc_binary_path"`
 }
 
-func getDefaultTezbakeModuleConfiguration() *TezbakeModuleConfiguration {
-	return &TezbakeModuleConfiguration{
+func getDefaultMavbakeModuleConfiguration() *MavbakeModuleConfiguration {
+	return &MavbakeModuleConfiguration{
 		moduleConfigurationbase: moduleConfigurationbase{
 			Applications: map[string]string{
 				"node":   constants.DEFAULT_NODE_APP_PATH,
@@ -55,7 +55,7 @@ type nodePublicKeyHashAlias struct {
 
 type nodePublicKeys []nodePublicKeyHashAlias
 
-func (configuration *TezbakeModuleConfiguration) GetNodeAppPath() string {
+func (configuration *MavbakeModuleConfiguration) GetNodeAppPath() string {
 	path, ok := configuration.Applications["node"]
 	if !ok {
 		return ""
@@ -63,7 +63,7 @@ func (configuration *TezbakeModuleConfiguration) GetNodeAppPath() string {
 	return path
 }
 
-func (configuration *TezbakeModuleConfiguration) loadBakersFromNodeConfiguration() {
+func (configuration *MavbakeModuleConfiguration) loadBakersFromNodeConfiguration() {
 	aliases := []string{"baker"} // baker is used by default
 
 	nodeAppPath := configuration.GetNodeAppPath()
@@ -93,7 +93,7 @@ func (configuration *TezbakeModuleConfiguration) loadBakersFromNodeConfiguration
 	aliases = append(aliases, nodeApp.Configuration.AdditionalKeysAliases...)
 
 	// r.Bakers
-	publicKeyHashesPath := filepath.Join(nodeAppPath, "data", ".tezos-client", "public_key_hashs")
+	publicKeyHashesPath := filepath.Join(nodeAppPath, "data", ".mavryk-client", "public_key_hashs")
 	publicKeyHashesBytes, err := os.ReadFile(publicKeyHashesPath)
 	if err != nil {
 		slog.Error("failed to read node public_key_hashs file", "error", err.Error())
@@ -117,14 +117,14 @@ func (configuration *TezbakeModuleConfiguration) loadBakersFromNodeConfiguration
 
 }
 
-func (c *TezbakeModuleConfiguration) Hydrate() {
+func (c *MavbakeModuleConfiguration) Hydrate() {
 	if len(c.Bakers) == 0 {
 		c.loadBakersFromNodeConfiguration()
 	}
 
 	validBakers := []string{}
 	for _, baker := range c.Bakers {
-		if _, err := tezos.ParseAddress(baker); err == nil {
+		if _, err := mavryk.ParseAddress(baker); err == nil {
 			validBakers = append(validBakers, baker)
 		} else {
 			slog.Warn("Invalid baker address", "address", baker)
@@ -164,7 +164,7 @@ func normalizeVersion(version string) string {
 	return "v" + version
 }
 
-func (c *TezbakeModuleConfiguration) Validate() error {
+func (c *MavbakeModuleConfiguration) Validate() error {
 	if _, err := url.Parse(c.SignerUrl); err != nil {
 		return constants.ErrInvalidSignerUrl
 	}

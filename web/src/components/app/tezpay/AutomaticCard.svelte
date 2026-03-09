@@ -5,7 +5,7 @@
 	import { formatTimestamp, formatTimestampAgo } from '@src/util/format';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import Button from '@components/starlight/components/Button.svelte';
-	import { extractContinualServiceInfo } from '@src/util/tezpay';
+	import { extractContinualServiceInfo } from '@src/util/mavpay';
 
 	export let services: ServicesStatus = {
 		timestamp: 0,
@@ -35,8 +35,8 @@
 	}>();
 
 	// this is ugly af but it works
-	$: hasTezpayStatus = !!extractContinualServiceInfo(services.applications?.tezpay);
-	$: isTezpayRunning = extractContinualServiceInfo(services.applications?.tezpay)?.status === 'running';
+	$: hasMavpayStatus = !!extractContinualServiceInfo(services.applications?.mavpay);
+	$: isMavpayRunning = extractContinualServiceInfo(services.applications?.mavpay)?.status === 'running';
 </script>
 
 <Card>
@@ -88,9 +88,9 @@
 			<!-- <div class="label">updated</div> -->
 		</div>
 
-		{#if hasTezpayStatus}
+		{#if hasMavpayStatus}
 			<div class="tools">
-				{#if isTezpayRunning}
+				{#if isMavpayRunning}
 					<Button on:click={() => dispatch('stop')}>STOP</Button>
 				{:else}
 					<Button on:click={() => dispatch('start')}>START</Button>

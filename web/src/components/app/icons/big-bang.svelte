@@ -9,7 +9,6 @@
 	style="enable-background:new 0 0 32 32;"
 	xml:space="preserve"
 >
-
 	<path
 		class="st0"
 		d="M9.9,12.4c-1.6,0-2.9,1.1-3.3,2.6H2.8c-0.6,0-1,0.4-1,1s0.4,1,1,1h3.8c0.5,1.4,1.7,2.3,3.3,2.3

@@ -14,7 +14,6 @@
 
 	let autoMenuWidth: string = 'unset';
 
-
 	const dispatch = createEventDispatcher();
 
 	const autoCloseListener = (e: MouseEvent) => {
@@ -88,7 +87,7 @@
 			<Card class="items">
 				{#each items as item}
 					<slot name="menu-item" {select} {item}>
-						<Button disabled="{item.disabled}" on:click={() => select(item)}>
+						<Button disabled={item.disabled} on:click={() => select(item)}>
 							<div class="item">
 								{#if item.icon}
 									{#if item.icon.kind === 'font'}

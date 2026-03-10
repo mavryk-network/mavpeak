@@ -11,7 +11,13 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class="icon {_class}" role="button" tabindex="0" on:click={() => dispatch('click')} on:keypress={() => dispatch('click')}>
+<div
+	class="icon {_class}"
+	role="button"
+	tabindex="0"
+	on:click={() => dispatch('click')}
+	on:keypress={() => dispatch('click')}
+>
 	<svelte:component this={icon.component} />
 </div>
 

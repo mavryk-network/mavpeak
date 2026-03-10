@@ -183,7 +183,9 @@
 			</div>
 			<div class="vote-section" class:disabled={!pkh}>
 				{#if existingVote}
-					<div class="existing-vote">You voted: <div class="ballot">{existingVote.ballot}</div></div>
+					<div class="existing-vote">
+						You voted: <div class="ballot">{existingVote.ballot}</div>
+					</div>
 				{:else}
 					<div class="nay">
 						<Button on:click={() => vote('nay')}>

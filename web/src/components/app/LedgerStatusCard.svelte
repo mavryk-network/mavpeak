@@ -8,7 +8,7 @@
 
 	$: is_authorized = !!info.authorized;
 	$: is_connected = info.ledger_status === 'connected';
-	$: app_version = info.app_version ?? "N/A"
+	$: app_version = info.app_version ?? 'N/A';
 </script>
 
 <div class="ledger-wrap">

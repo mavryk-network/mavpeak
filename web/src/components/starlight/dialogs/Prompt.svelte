@@ -38,7 +38,9 @@
 		isOpen = false;
 	}
 
-	export async function prompt<TValue>(options: Partial<PromptDialogState<TValue>>): Promise<TValue> {
+	export async function prompt<TValue>(
+		options: Partial<PromptDialogState<TValue>>
+	): Promise<TValue> {
 		isOpen = true;
 		state = { ...defaultState, ...options };
 		return new Promise<TValue>((resolve, reject) => {
@@ -74,10 +76,16 @@
 			</slot>
 			<div class="controls padding-top">
 				<div class="control-button" style:grid-column="1">
-					<Button label={state.cancelText} on:click={() => promptFinalizers.reject(USER_CANCELED)} />
+					<Button
+						label={state.cancelText}
+						on:click={() => promptFinalizers.reject(USER_CANCELED)}
+					/>
 				</div>
 				<div class="control-button" class:disabled={isValid} style:grid-column="3">
-					<Button label={state.confirmText} on:click={() => promptFinalizers.resolve(state.value)} />
+					<Button
+						label={state.confirmText}
+						on:click={() => promptFinalizers.resolve(state.value)}
+					/>
 				</div>
 			</div>
 		</div>

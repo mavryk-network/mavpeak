@@ -34,13 +34,24 @@
 	async function inject() {
 		if (!pkh) return;
 		open = false;
-		dispatch('tx_building', { message: `building proposal upvote - ${proposal}`, stage: "building" });
+		dispatch('tx_building', {
+			message: `building proposal upvote - ${proposal}`,
+			stage: 'building'
+		});
 		const result = await upvote_proposal(pkh, periodIndex, [proposal]);
 		if (typeof result === 'string') {
-			dispatch('tx_broadcasted', { message: `proposal upvote - ${proposal}`, opHash: result, stage: "confirming" });
+			dispatch('tx_broadcasted', {
+				message: `proposal upvote - ${proposal}`,
+				opHash: result,
+				stage: 'confirming'
+			});
 			return;
 		}
-		dispatch('error', { message: `Failed to upvote. Reason: ${result}`, error: result, stage: "failed"  });
+		dispatch('error', {
+			message: `Failed to upvote. Reason: ${result}`,
+			error: result,
+			stage: 'failed'
+		});
 	}
 
 	const proposalValidationRules = [

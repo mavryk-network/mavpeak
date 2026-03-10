@@ -11,7 +11,6 @@
 	export let showColor = false;
 
 	$: bakerColor = getBakerColor(baker);
-
 </script>
 
 <Card>

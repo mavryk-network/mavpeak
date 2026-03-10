@@ -12,7 +12,8 @@
 	}
 
 	$: hasMavpayStatus = !!extractContinualServiceInfo($services.applications?.mavpay);
-	$: isMavpayRunning = extractContinualServiceInfo($services.applications?.mavpay)?.status === 'running';
+	$: isMavpayRunning =
+		extractContinualServiceInfo($services.applications?.mavpay)?.status === 'running';
 </script>
 
 <div class="governance-wrap">

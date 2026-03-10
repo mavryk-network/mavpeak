@@ -15,15 +15,14 @@
 	const dispatch = createEventDispatcher();
 
 	const navigate = () => {
-		dispatch("click");
+		dispatch('click');
 		if (path && path !== '.') goto(path);
 	};
 
 	$: active = isActive !== undefined ? isActive : path && $page.url.pathname === path;
-	
 </script>
 
-<div class="menu-item-wrap" class:disabled={isDisabled} class:active={active}>
+<div class="menu-item-wrap" class:disabled={isDisabled} class:active>
 	<a class="menu-item" href={path} on:click|preventDefault={navigate}>
 		<slot name="icon">
 			<div class="menu-item-icon svg-icon">

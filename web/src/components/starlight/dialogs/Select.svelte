@@ -43,18 +43,18 @@
 		promptOptions: Partial<SelectDialogState<TValue>>
 	): Promise<TValue> {
 		isOpen = true;
-		options = (promptOptions.options ?? []).map(
-			(v) => {
-				if (typeof v === 'object') {
-					return v as SelectItem<TValue>;
-				}
-				return { label: v, value: v } as SelectItem<TValue>;
+		options = (promptOptions.options ?? []).map((v) => {
+			if (typeof v === 'object') {
+				return v as SelectItem<TValue>;
 			}
-		);
+			return { label: v, value: v } as SelectItem<TValue>;
+		});
 
 		state = { ...defaultState, ...promptOptions };
-		value = options.find((v) => (v as SelectItem<TValue>).value === state.value) as SelectItem<TValue>;
-		
+		value = options.find(
+			(v) => (v as SelectItem<TValue>).value === state.value
+		) as SelectItem<TValue>;
+
 		return new Promise<TValue>((resolve, reject) => {
 			promptFinalizers = {
 				resolve: () => {
@@ -83,7 +83,7 @@
 					<p class="message">{state.message}</p>
 				{/if}
 			</slot>
-			<Select bind:value options={options} />
+			<Select bind:value {options} />
 			<div class="controls padding-top">
 				<div class="control-button" style:grid-column="1">
 					<Button

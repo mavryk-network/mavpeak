@@ -30,7 +30,9 @@
 		isOpen = false;
 	}
 
-	export async function request_confirmation<TValue>(options: Partial<ConfirmDialogState>): Promise<TValue> {
+	export async function request_confirmation<TValue>(
+		options: Partial<ConfirmDialogState>
+	): Promise<TValue> {
 		isOpen = true;
 		state = { ...defaultState, ...options };
 		return new Promise<TValue>((resolve, reject) => {
@@ -61,7 +63,10 @@
 			</slot>
 			<div class="controls padding-top">
 				<div class="control-button" style:grid-column="1">
-					<Button label={state.cancelText} on:click={() => promptFinalizers.reject(USER_CANCELED)} />
+					<Button
+						label={state.cancelText}
+						on:click={() => promptFinalizers.reject(USER_CANCELED)}
+					/>
 				</div>
 				<div class="control-button" style:grid-column="3">
 					<Button label={state.confirmText} on:click={() => promptFinalizers.resolve()} />
@@ -98,5 +103,5 @@
 		.control-button
 			min-width: 100px
 			--button-horizontal-spacing: var(--spacing-x2)
-			
+
 </style>

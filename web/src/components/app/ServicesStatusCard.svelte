@@ -49,13 +49,11 @@
 				<Separator />
 			</div>
 
-
 			{#each iterableServices as [id, appServices]}
-	
 				{#if !hideApplicationTitle}
 					<div class="application-title">{id}</div>
 				{:else}
-					<div class="application-title"/>
+					<div class="application-title" />
 				{/if}
 				{#if appServices.length === 0}
 					<div class="no-services">N/A</div>

@@ -1,7 +1,11 @@
-import type { BallotVote } from "@src/common/types/governance";
-import axios, { AxiosError } from "axios";
+import type { BallotVote } from '@src/common/types/governance';
+import axios, { AxiosError } from 'axios';
 
-export async function upvote_proposal(pkh: string, period: number, proposals: string[]): Promise<string | Error> {
+export async function upvote_proposal(
+	pkh: string,
+	period: number,
+	proposals: string[]
+): Promise<string | Error> {
 	try {
 		const response = await axios.post('/api/governance/upvote', {
 			proposals: proposals,
@@ -19,7 +23,12 @@ export async function upvote_proposal(pkh: string, period: number, proposals: st
 	}
 }
 
-export async function cast_vote(pkh: string, period: number, proposal: string, ballot: BallotVote): Promise<string | Error> {
+export async function cast_vote(
+	pkh: string,
+	period: number,
+	proposal: string,
+	ballot: BallotVote
+): Promise<string | Error> {
 	try {
 		const response = await axios.post('/api/governance/upvote', {
 			proposal: proposal,
@@ -37,7 +46,6 @@ export async function cast_vote(pkh: string, period: number, proposal: string, b
 		return err as Error;
 	}
 }
-
 
 export function openMavgov() {
 	window.open('https://governance.mavryk.org', '_blank');

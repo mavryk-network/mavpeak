@@ -56,7 +56,6 @@
 </script>
 
 <OverlayDialog bind:open={isOpen} persistent>
-
 	<Card>
 		<div class="terminal-wrap">
 			<slot name="title" {...state}>

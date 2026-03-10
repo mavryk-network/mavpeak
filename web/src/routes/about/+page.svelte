@@ -120,7 +120,7 @@
 		</div>
 		<div class="navigation">
 			<div class="home">
-				<Button label="Home" on:click={() => goto("/")} />
+				<Button label="Home" on:click={() => goto('/')} />
 			</div>
 		</div>
 	</div>

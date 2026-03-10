@@ -22,5 +22,5 @@ export const PHASE_MAPPING = {
 	accumulate_payouts: `Accumulating payouts`,
 	executing_batch: `Executing batch`,
 	batch_execution_finished: `Batch execution finished`,
-	batch_waiting_for_confirmation: `Batch waiting for confirmation`,
-}
+	batch_waiting_for_confirmation: `Batch waiting for confirmation`
+};

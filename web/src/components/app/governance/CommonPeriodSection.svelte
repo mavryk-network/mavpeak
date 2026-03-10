@@ -20,9 +20,7 @@
 	}
 </script>
 
-<div
-	class="period-wrap"
->
+<div class="period-wrap">
 	<div class="period">
 		<div class="proposal">
 			<div class="title">

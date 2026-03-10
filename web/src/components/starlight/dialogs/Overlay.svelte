@@ -5,14 +5,14 @@
 	let persistent: boolean = false;
 	let _class: string = '';
 	let dialog: HTMLDialogElement;
-	
+
 	const close = () => {
 		dialog.classList.add('hide');
 		const cleanup = () => {
 			dialog.classList.remove('hide');
 			open = false;
 			dialog.removeEventListener('animationend', cleanup);
-		}
+		};
 		dialog.addEventListener('animationend', cleanup);
 	};
 	$: background_click = persistent ? () => {} : close;

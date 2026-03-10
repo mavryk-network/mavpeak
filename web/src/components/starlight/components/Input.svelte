@@ -24,10 +24,7 @@
 	}
 
 	$: isInvalid = validate(value, rules) !== true;
-	$: invalidHint =
-		invalid === true
-			? hint
-			: (isInvalid ? validate(value, rules) as string : "");
+	$: invalidHint = invalid === true ? hint : isInvalid ? (validate(value, rules) as string) : '';
 
 	let inputElement: HTMLInputElement;
 	function focusInput() {

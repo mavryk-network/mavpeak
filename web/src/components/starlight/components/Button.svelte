@@ -14,7 +14,7 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<button class="button {_class}" class:disabled={disabled} on:click={() => dispatch('click')}>
+<button class="button {_class}" class:disabled on:click={() => dispatch('click')}>
 	<slot>
 		{actualText}
 	</slot>

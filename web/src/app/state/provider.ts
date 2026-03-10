@@ -1,4 +1,4 @@
-export type StatusProviderStatus = "connected" | "disconnected" | "reconnecting" | "paused";
+export type StatusProviderStatus = 'connected' | 'disconnected' | 'reconnecting' | 'paused';
 
 export class StatusProvider {
 	private url: string;
@@ -6,8 +6,8 @@ export class StatusProvider {
 	private retryCount = 0;
 	private retryDelay: number; // Delay in milliseconds
 
-	public onmessage: (event: MessageEvent) => void = () => { };
-	public onstatuschange: (status: StatusProviderStatus) => void = () => { };
+	public onmessage: (event: MessageEvent) => void = () => {};
+	public onstatuschange: (status: StatusProviderStatus) => void = () => {};
 
 	constructor(url: string, retryDelay = 3000) {
 		this.url = url;
@@ -17,7 +17,7 @@ export class StatusProvider {
 
 	public pause() {
 		this.eventSource?.close();
-		this.onstatuschange("paused");
+		this.onstatuschange('paused');
 	}
 
 	public resume() {
@@ -35,12 +35,12 @@ export class StatusProvider {
 		this.eventSource.onmessage = (event) => this.onmessage(event);
 
 		this.eventSource.onerror = () => {
-			this.onstatuschange("disconnected");
+			this.onstatuschange('disconnected');
 			this.eventSource?.close(); // Close the existing connection
 
 			setTimeout(() => {
 				this.retryCount++;
-				this.onstatuschange("reconnecting");
+				this.onstatuschange('reconnecting');
 				this.connect(); // Attempt to reconnect
 			}, this.retryDelay);
 		};

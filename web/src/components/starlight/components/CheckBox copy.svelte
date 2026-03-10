@@ -2,7 +2,7 @@
 
 <script lang="ts">
 	export let value = false;
-	export let label : string = '';
+	export let label: string = '';
 
 	const check = () => {
 		value = !value;
@@ -28,7 +28,6 @@
 			<div class="text">{label}</div>
 		{/if}
 	</label>
-	
 </div>
 
 <style lang="sass">

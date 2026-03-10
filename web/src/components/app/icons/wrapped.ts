@@ -1,8 +1,10 @@
-import { mapValues } from "lodash-es"
-import { ComponentIcon } from "@src/components/starlight/types"
-import type { SvelteComponent } from "svelte"
+import { mapValues } from 'lodash-es';
+import { ComponentIcon } from '@src/components/starlight/types';
+import type { SvelteComponent } from 'svelte';
 
-import * as icons from "."
+import * as icons from '.';
 
-export const WrappedIcons = mapValues(icons, (icon) => ComponentIcon(icon as (typeof SvelteComponent)))
-export default WrappedIcons
+export const WrappedIcons = mapValues(icons, (icon) =>
+	ComponentIcon(icon as typeof SvelteComponent)
+);
+export default WrappedIcons;

@@ -7,7 +7,7 @@ export async function readBody(response: Response, cb: (message: string) => void
 	const decoder = new TextDecoder('utf-8');
 	let buffer = '';
 
-	for (; ;) {
+	for (;;) {
 		const { done, value } = await reader.read();
 		if (done) {
 			if (buffer.length > 0) {

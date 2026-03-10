@@ -6,7 +6,7 @@
 </script>
 
 <div class="card {_class}">
-	<slot/>
+	<slot />
 </div>
 
 <style lang="sass">

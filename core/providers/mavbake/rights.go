@@ -192,11 +192,11 @@ func checkRealized(ctx context.Context, rights BlockRights) (BlockRights, error)
 				switch c.Kind() {
 				case mavryk.OpTypeAttestation, mavryk.OpTypeAttestationWithDal:
 					acc = append(acc, c.Meta().Delegate.String())
-				case mavryk.OpTypeAttestationsAggregate:
-					op := c.(*rpc.AttestationsAggregate)
-					for _, committee := range op.Metadata.CommitteeMetadata {
-						acc = append(acc, committee.Delegate.String())
-					}
+				// case mavryk.OpTypeAttestationsAggregate:
+				// 	op := c.(*rpc.AttestationsAggregate)
+				// 	for _, committee := range op.Metadata.CommitteeMetadata {
+				// 		acc = append(acc, committee.Delegate.String())
+				// 	}
 				}
 			}
 		}

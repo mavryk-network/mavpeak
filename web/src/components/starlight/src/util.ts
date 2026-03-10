@@ -1,7 +1,10 @@
-import type { ValidationRules } from "../types";
-import { MENU_LAYER_ID } from "./constants";
+import type { ValidationRules } from '../types';
+import { MENU_LAYER_ID } from './constants';
 
-export function teleportUnderElement(element: HTMLElement & { __origin?: HTMLElement | null }, targetId: string) {
+export function teleportUnderElement(
+	element: HTMLElement & { __origin?: HTMLElement | null },
+	targetId: string
+) {
 	element.__origin = element.parentElement;
 	element.parentElement?.removeChild(element);
 	document.getElementById(targetId)?.appendChild(element);
@@ -18,8 +21,8 @@ export function teleportToMenulayer(element: HTMLElement & { __origin?: HTMLElem
 }
 
 export function createMenuLayer() {
-	if (document.getElementById(MENU_LAYER_ID)) return
-	const menuLayer = document.createElement("div");
+	if (document.getElementById(MENU_LAYER_ID)) return;
+	const menuLayer = document.createElement('div');
 	menuLayer.id = MENU_LAYER_ID;
 	document.body.appendChild(menuLayer);
 }
@@ -37,5 +40,5 @@ export function createKeyPressHandler(keys: Array<string>, handler: (...args: Ar
 		if (keys.includes(event.key)) {
 			handler(event);
 		}
-	}
+	};
 }

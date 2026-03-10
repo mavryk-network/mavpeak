@@ -1,17 +1,17 @@
-import type { PeakStatus } from "./types/status"
+import type { PeakStatus } from './types/status';
 
-export const MAVPEAK_VERSION = "<VERSION>"
-export const MAVPEAK_CODENAME = "<CODENAME>"
+export const MAVPEAK_VERSION = '<VERSION>';
+export const MAVPEAK_CODENAME = '<CODENAME>';
 
-export const DEPOSIT_LIMIT_DELEGATION_CAPACITY_MULTIPLIER = 9n
-export const BLOCK_TIME = 6 * 1000 // 6 seconds in milliseconds
+export const DEPOSIT_LIMIT_DELEGATION_CAPACITY_MULTIPLIER = 9n;
+export const BLOCK_TIME = 6 * 1000; // 6 seconds in milliseconds
 
-export const EXPLORER_URL = "https://nexus.mavryk.org/explorer"
+export const EXPLORER_URL = 'https://nexus.mavryk.org/explorer';
 
 // governance
-export const PROPOSAL_PERIOD_QUORUM_PERCENTAGE = 5n
-export const PROPOSAL_REQUIRED_MAJORITY_PERCENTAGE = 80n
-export const PROPOSAL_PROPOSAL_URL = "https://proposals.mavryk.org"
+export const PROPOSAL_PERIOD_QUORUM_PERCENTAGE = 5n;
+export const PROPOSAL_REQUIRED_MAJORITY_PERCENTAGE = 80n;
+export const PROPOSAL_PROPOSAL_URL = 'https://proposals.mavryk.org';
 
 export const EMPTY_PEAK_STATUS: PeakStatus = {
 	modules: {
@@ -19,4 +19,4 @@ export const EMPTY_PEAK_STATUS: PeakStatus = {
 		mavpay: undefined
 	},
 	nodes: {}
-}
+};

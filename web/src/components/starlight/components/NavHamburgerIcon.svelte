@@ -1,7 +1,7 @@
 <svelte:options immutable />
 
 <script lang="ts">
-	export let expanded = false
+	export let expanded = false;
 </script>
 
 <div class="nav-icon-wrap">

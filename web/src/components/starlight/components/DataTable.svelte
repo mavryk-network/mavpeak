@@ -32,7 +32,7 @@
 			? columns.filter((column) => !column.hidden)
 			: Object.keys(preprocessedData[0] ?? {}).map(
 					(key) => ({ name: key, label: key, sortable: true, filterable: true }) as DataTableColumn
-			  );
+				);
 
 	//#region data preprocessing
 	export let filter = '';
@@ -225,29 +225,29 @@
 	<div class="width-observer">
 		<table bind:this={widthObserverTable}>
 			<thead>
-			<tr bind:this={widthObserverHeader}>
-				{#if selectionEnabled}
-					<div class="header cell checkbox*cell">
-						<CheckBox class="checkbox" />
-					</div>
-				{/if}
-				<!-- slot header -->
-				<slot name="header" {dataColumns} {activeSort} {compactModeEnabled}>
-					{#each dataColumns as column}
-						<th class:sortable-column={column.sortable}>
-							<slot name="column-header" {column} {activeSort} {compactModeEnabled}>
-								<div class="column-header-content">
-									<b class="column-header-label">{column.label ?? column.name}</b>
-									<div class="space-fill"></div>
-									<div class="sort-arrow">
-										<ArrowDown />
+				<tr bind:this={widthObserverHeader}>
+					{#if selectionEnabled}
+						<div class="header cell checkbox*cell">
+							<CheckBox class="checkbox" />
+						</div>
+					{/if}
+					<!-- slot header -->
+					<slot name="header" {dataColumns} {activeSort} {compactModeEnabled}>
+						{#each dataColumns as column}
+							<th class:sortable-column={column.sortable}>
+								<slot name="column-header" {column} {activeSort} {compactModeEnabled}>
+									<div class="column-header-content">
+										<b class="column-header-label">{column.label ?? column.name}</b>
+										<div class="space-fill"></div>
+										<div class="sort-arrow">
+											<ArrowDown />
+										</div>
 									</div>
-								</div>
-							</slot>
-						</th>
-					{/each}
-				</slot>
-			</tr>
+								</slot>
+							</th>
+						{/each}
+					</slot>
+				</tr>
 			</thead>
 		</table>
 	</div>
@@ -320,15 +320,15 @@
 									<b class="column-header-label">{column.label ?? column.name}</b>
 									<!-- <div class="space-fill"></div> -->
 									{#if column.sortable}
-									<div
-										class="sort-arrow"
-										class:sort-arrow-active={activeSort && activeSort?.column === column.name}
-										class:sort-arrow-asc={activeSort &&
-											activeSort?.column === column.name &&
-											activeSort?.direction === 'asc'}
-									>
-										<ArrowDown />
-									</div>
+										<div
+											class="sort-arrow"
+											class:sort-arrow-active={activeSort && activeSort?.column === column.name}
+											class:sort-arrow-asc={activeSort &&
+												activeSort?.column === column.name &&
+												activeSort?.direction === 'asc'}
+										>
+											<ArrowDown />
+										</div>
 									{/if}
 								</div>
 							</slot>
@@ -358,7 +358,8 @@
 					{/if}
 					{#if !compactModeEnabled}
 						{#each dataColumns as column}
-							{@const columnSelectionEnabled = enableRowClickSelect && selectionEnabled && !column.disableSelect && !column.click}
+							{@const columnSelectionEnabled =
+								enableRowClickSelect && selectionEnabled && !column.disableSelect && !column.click}
 							<button
 								class="unstyle-button cell"
 								class:even-row={i % 2 === 0}

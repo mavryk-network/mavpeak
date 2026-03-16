@@ -105,7 +105,7 @@ func SetupModule(ctx context.Context, configuration *configuration.MavbakeModule
 	}
 	setupBakerStatusProviders(ctx, configuration.Bakers, mavbakeStatusChannel)
 	if configuration.ArcBinaryPath != "" {
-		startWalletsStatusProvider(ctx, configuration.Applications["signer"], configuration.ArcBinaryPath, configuration.LedgerWallets, mavbakeStatusChannel)
+		go startWalletsStatusProvider(ctx, configuration.Applications["signer"], configuration.ArcBinaryPath, configuration.LedgerWallets, mavbakeStatusChannel)
 	}
 	common.StartServiceStatusProviders(ctx, configuration.Applications, mavbakeStatusChannel)
 

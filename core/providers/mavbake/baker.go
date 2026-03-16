@@ -133,7 +133,12 @@ func setupBakerStatusProviders(ctx context.Context, bakers []string, statusChann
 
 				bakersStatus := map[string]*BakerStakingStatus{}
 				for _, baker := range bakers {
-					bakersStatus[baker], _ = getBakerStatusFor(ctx, baker)
+					status, err := getBakerStatusFor(ctx, baker)
+					if err != nil {
+						slog.Debug("failed to get baker status", "baker", baker, "error", err.Error())
+						continue
+					}
+					bakersStatus[baker] = status
 				}
 				statusChannel <- &BakersStatusUpdate{
 					BakersStatus: BakersStatus{

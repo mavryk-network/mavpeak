@@ -93,8 +93,10 @@ func main() {
 		Browse:       false,
 	}))
 
+	slog.Info("Starting HTTP server", "listen", config.Listen)
 	err = app.Listen(config.Listen)
 	if err != nil && err != http.ErrServerClosed {
+		slog.Error("Failed to start HTTP server", "error", err.Error())
 		panic(err)
 	}
 }

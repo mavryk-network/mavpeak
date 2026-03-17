@@ -16,7 +16,7 @@
 		<!-- <slot name="header" /> -->
 		<div class="title-wrap">
 			<a class="unstyle-link" href="/about">
-				<h4>{$APP_ID}</h4>
+				<img src="/assets/mavpeak-logo-white.png" alt="MavPeak" class="nav-logo" />
 			</a>
 			<div class="connection-status">
 				<div
@@ -54,7 +54,7 @@
 	height: 100vh
 	width: 100vw
 	pointer-events: none
-	background-image: url('/assets/images/svg/bg.svg')
+	background-color: #000000
 	background-size: cover
 	background-position: center
 	z-index: -2
@@ -88,6 +88,11 @@
 			align-items: center
 			padding: 0 var(--spacing)
 			text-transform: uppercase
+
+			.nav-logo
+				height: 28px
+				width: auto
+				display: block
 		
 		.connection-status
 			grid-column: 3

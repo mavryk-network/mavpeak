@@ -9,7 +9,7 @@
 	export let title = `Node`;
 
 	$: blockTimestamp = formatTimestampAgoStrict(node.block?.timestamp ?? 0);
-	$: isMvkt = title.toLowerCase().includes('mvkt');
+	$: isMvkt = title.toLowerCase() !== 'baker';
 	$: cardColor = isMvkt ? 'var(--amber)' : 'var(--green)';
 	$: cardAccent = isMvkt
 		? 'linear-gradient(90deg, var(--amber), var(--amber-dim))'

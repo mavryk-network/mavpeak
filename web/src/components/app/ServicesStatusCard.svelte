@@ -128,7 +128,7 @@
 
 	.list-header
 		display: grid
-		grid-template-columns: 1fr auto auto
+		grid-template-columns: 1fr 90px 90px
 		gap: 16px
 		padding: 0 12px 8px
 		border-bottom: 1px solid var(--border-default)
@@ -142,7 +142,6 @@
 
 		span:not(:first-child)
 			text-align: center
-			min-width: 70px
 
 	.app-title
 		font-size: 11px
@@ -154,7 +153,7 @@
 
 	.service-row
 		display: grid
-		grid-template-columns: 1fr auto auto
+		grid-template-columns: 1fr 90px 90px
 		gap: 16px
 		align-items: center
 		padding: 10px 12px
@@ -180,7 +179,6 @@
 		font-family: var(--font-mono)
 		font-size: 12px
 		color: var(--text-muted)
-		min-width: 70px
 		text-align: center
 
 .timestamp

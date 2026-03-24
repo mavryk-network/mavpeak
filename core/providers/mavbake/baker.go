@@ -2,7 +2,6 @@ package mavbake
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -37,25 +36,25 @@ type BakerStakingStatus struct {
 func getBakerBalances(ctx context.Context, client *common.ActiveRpcNode, addr mavryk.Address, id rpc.BlockID) (*BakerStakingStatus, error) {
 	base := fmt.Sprintf("chains/main/blocks/%s/context/contracts/%s", id, addr)
 
-	var fullBalance mavryk.Z
+	var fullBalance string
 	if err := client.Get(ctx, base+"/full_balance", &fullBalance); err != nil {
 		return nil, fmt.Errorf("full_balance: %w", err)
 	}
 
-	var stakedBalance mavryk.Z
+	var stakedBalance string
 	if err := client.Get(ctx, base+"/staked_balance", &stakedBalance); err != nil {
 		return nil, fmt.Errorf("staked_balance: %w", err)
 	}
 
-	var liquidBalance mavryk.Z
+	var liquidBalance string
 	if err := client.Get(ctx, base+"/balance", &liquidBalance); err != nil {
 		return nil, fmt.Errorf("balance: %w", err)
 	}
 
 	return &BakerStakingStatus{
-		FullBalance:   fullBalance.String(),
-		StakedBalance: stakedBalance.String(),
-		LiquidBalance: liquidBalance.String(),
+		FullBalance:   fullBalance,
+		StakedBalance: stakedBalance,
+		LiquidBalance: liquidBalance,
 	}, nil
 }
 
@@ -65,9 +64,6 @@ func getBakerStatusFor(ctx context.Context, baker string) (*BakerStakingStatus, 
 		return nil, err
 	}
 	return common.AttemptWithRpcClients(ctx, func(client *common.ActiveRpcNode) (*BakerStakingStatus, error) {
-		if !client.IsGovernanceProvider {
-			return nil, errors.New("node is not a governance provider")
-		}
 		return getBakerBalances(ctx, client, addr, rpc.Head)
 	})
 }

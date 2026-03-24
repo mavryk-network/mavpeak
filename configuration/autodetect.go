@@ -194,7 +194,7 @@ func AutoDetect(rootDir string, destinationFile string) {
 		modules[constants.MAVBAKE_MODULE_ID] = mavbakeConfig
 	}
 
-	config := Runtime{
+	config := v0{
 		Id:      "",
 		AppRoot: rootDir,
 		Listen:  constants.DEFAULT_LISTEN_ADDRESS,

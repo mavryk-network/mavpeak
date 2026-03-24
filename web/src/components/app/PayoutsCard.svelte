@@ -25,7 +25,7 @@
 			<Separator />
 
 			<div class="payouts-info">
-				<div class="row" />
+				<div class="row"></div>
 				<div class="property">Automatic Payouts:</div>
 				{#if !hasMavpayStatus}
 					<div class="value automatic-payouts-status">DISABLED</div>
@@ -45,7 +45,7 @@
 						{formatBalance($wallet.balance)}
 					</div>
 				{/if}
-				<div class="row" />
+				<div class="row"></div>
 			</div>
 			<div class="enter">
 				<Button on:click={open_governance}>OPEN</Button>
@@ -106,25 +106,6 @@
 			align-items: end
 		
 
-	.remaining
-		display: flex
-		justify-content: right
-		align-items: flex-end
-		grid-row: 5
-
-		.value
-			display: inline-block
-			padding-left : var(--spacing-f2)
-			font-size: 1.25rem
-			font-weight: 500
-
-	.no-data
-		display: flex
-		justify-content: center
-		align-items: center
-		font-size: 1.5rem
-		font-weight: 500
-		height: 100%
 
 .error 
 	color: var(--error-color)

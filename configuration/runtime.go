@@ -47,10 +47,6 @@ type MavrykNode struct {
 var (
 	MVD_RPC = MavrykNode{
 		Address:              "https://rpc.mavryk.network/",
-		IsGovernanceProvider: true,
-	}
-	MVKT_RPC = MavrykNode{
-		Address:              "https://mainnet.rpc.mavryk.network/",
 		IsBlockProvider:      true,
 		IsRightsProvider:     true,
 		IsGovernanceProvider: true,
@@ -181,8 +177,7 @@ func (r *Runtime) Hydrate() *Runtime {
 	if len(r.Nodes) == 0 {
 		r.Nodes = map[string]MavrykNode{
 			"baker":  BAKER_NODE,
-			"MVD":     MVD_RPC,
-			"MVKT":   MVKT_RPC,
+			"mavryk": MVD_RPC,
 		}
 	}
 

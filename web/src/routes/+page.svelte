@@ -34,8 +34,8 @@
 
 	$: displayBakers = $mavbakeBakers.length > 0 ? $mavbakeBakers : initialBakerBalances;
 	$: showBakerColors = $mavbakeBakers.length > 1;
-	$: bakerNodes = $nodes.filter(([t]) => !t.toLowerCase().includes('mvkt'));
-	$: mvktNodes = $nodes.filter(([t]) => t.toLowerCase().includes('mvkt'));
+	$: bakerNodes = $nodes.filter(([t]) => t.toLowerCase() === 'baker');
+	$: mvktNodes = $nodes.filter(([t]) => t.toLowerCase() !== 'baker');
 	$: hasServices = Object.keys($mavbakeServices.applications ?? {}).length > 0;
 </script>
 

@@ -2,157 +2,216 @@
 	import { flip } from 'svelte/animate';
 	import type { BlockRights } from '@src/common/types/status';
 	import Card from '../starlight/components/Card.svelte';
-	import Separator from '@components/app/Separator.svelte';
 	import { getBakerColor, normalizeBlockRights } from '@src/util/baker';
-
-	import BlockIcon from '@components/la/icons/cube-solid.svelte';
-	import AttestationIcon from '@components/la/icons/shield-alt-solid.svelte';
 
 	export let mode: 'upcoming' | 'past';
 	export let title = 'Baking Rights';
 	export let rights: BlockRights[];
 	export let showBakerColors = false;
+
+	$: isUpcoming = mode === 'upcoming';
+	$: cardAccent = isUpcoming
+		? 'linear-gradient(90deg, var(--blue), var(--blue-dim))'
+		: 'linear-gradient(90deg, var(--slate), var(--slate-dim))';
+	$: cardHoverShadow = isUpcoming ? '0 8px 32px var(--blue-glow)' : '0 8px 32px var(--slate-glow)';
+	$: cardColor = isUpcoming ? 'var(--blue)' : 'var(--slate)';
+	$: cardIconBg = isUpcoming ? 'var(--blue-glow)' : 'var(--slate-glow)';
+	$: cardIconBorder = isUpcoming ? 'rgba(96,165,250,0.3)' : 'rgba(148,163,184,0.2)';
 </script>
 
-<Card>
-	<div class="baker-rights">
-		<div class="title">
-			<h5>{title}</h5>
-		</div>
-		<Separator />
-		<div class="block-rights-wrap">
-			{#each rights as blockRights (blockRights.level)}
-				<div class="block-rights" animate:flip>
-					<div class="level">
-						{blockRights.level}
-					</div>
+<div
+	class="rights-wrap"
+	style:--card-accent={cardAccent}
+	style:--card-hover-shadow={cardHoverShadow}
+	style:--rights-color={cardColor}
+	style:--rights-icon-bg={cardIconBg}
+	style:--rights-icon-border={cardIconBorder}
+>
+	<Card>
+		<div class="baker-rights">
+			<div class="card-title">
+				<span class="icon">
+					{#if isUpcoming}
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+					{:else}
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+					{/if}
+				</span>
+				{title}
+			</div>
 
-					<div class="block-rights-inner">
+			<div class="rights-header">
+				<span>Block</span>
+				<span>Validate</span>
+				<span>Endorse</span>
+			</div>
+
+			<div class="block-rights-wrap">
+				{#each rights as blockRights (blockRights.level)}
+					<div animate:flip>
 						{#each normalizeBlockRights(blockRights) as right}
-							{#if showBakerColors}
-								<div
-									class="baker-assigned-color"
-									style:--assigned-color-color={getBakerColor(right.baker)}
-								>
-									<div class="baker-assigned-color-sign"></div>
-								</div>
-							{/if}
-							<div class="baker-block-rights">
-								<div
-									class="value"
-									class:no-rights={right.blocks === 0}
-									class:warning={mode === 'past' && right.realizedBlocks === 0}
-									class:success={mode === 'past' && right.realizedBlocks === 1}
-								>
-									{#if mode === 'past'}
-										{right.blocks}/{right.realizedBlocks * right.blocks}
-									{:else}
-										{right.blocks}
-									{/if}
-								</div>
-								<div class="icon" class:no-rights={right.blocks === 0}>
-									<BlockIcon />
+							<div class="rights-row" class:upcoming={isUpcoming}>
+								{#if showBakerColors}
+									<div class="baker-dot" style:background={getBakerColor(right.baker)}></div>
+								{/if}
+								<span class="rights-block">{blockRights.level.toLocaleString()}</span>
+
+								<div class="rights-stats">
+									<span class="rights-count"
+										class:no-rights={right.blocks === 0}
+										class:warning={mode === 'past' && right.realizedBlocks === 0 && right.blocks > 0}
+										class:success={mode === 'past' && right.realizedBlocks > 0}
+									>
+										{#if mode === 'past'}{right.blocks}/{right.realizedBlocks * right.blocks}{:else}{right.blocks}{/if}
+									</span>
+									<span class="rights-icon" class:dim={right.blocks === 0}>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+									</span>
 								</div>
 
-								<div
-									class="value"
-									class:no-rights={right.attestations === 0}
-									class:warning={mode === 'past' && right.realizedAttestations === 0}
-									class:success={mode === 'past' && right.realizedAttestations === 1}
-								>
-									{#if mode === 'past'}
-										{right.attestations}/{right.realizedAttestations * right.attestations}
-									{:else}
-										{right.attestations}
-									{/if}
-								</div>
-								<div class="icon" class:no-rights={right.attestations === 0}>
-									<AttestationIcon />
+								<div class="rights-stats">
+									<span class="rights-count"
+										class:no-rights={right.attestations === 0}
+										class:warning={mode === 'past' && right.realizedAttestations === 0 && right.attestations > 0}
+										class:success={mode === 'past' && right.realizedAttestations > 0}
+									>
+										{#if mode === 'past'}{right.attestations}/{right.realizedAttestations * right.attestations}{:else}{right.attestations}{/if}
+									</span>
+									<span class="rights-icon" class:dim={right.attestations === 0}>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+									</span>
 								</div>
 							</div>
 						{/each}
 					</div>
-				</div>
-			{/each}
+				{/each}
+			</div>
 		</div>
-	</div>
-</Card>
+	</Card>
+</div>
 
 <style lang="sass">
+.rights-wrap
+	height: 100%
+	display: grid
+
+	:global(.card)
+		height: 100%
+		box-sizing: border-box
+
 .baker-rights
 	display: grid
+	grid-template-rows: auto auto 1fr
+	height: 100%
 	gap: var(--spacing)
-	.title
+
+	.card-title
 		display: flex
-		justify-content: center
-		h5
-			font-size: 1.5rem
-			font-weight: 500
-			margin: 0
-	.block-rights-wrap
-		display: grid
+		align-items: center
+		gap: 8px
+		font-size: 13px
+		font-weight: 600
+		text-transform: uppercase
+		letter-spacing: 1.5px
+		color: var(--rights-color)
 
-		max-height: 400px
-		overflow: auto
-		justify-content: center
-
-		.block-rights
-			display: grid
-			gap: var(--spacing-f2)
-			grid-template-columns: auto auto 1fr
+		.icon
+			width: 20px
+			height: 20px
+			border-radius: 6px
+			display: flex
 			align-items: center
-			transition: background-color 0.2s
-			padding: var(--spacing-f2)
-			border-radius: var(--border-radius)
+			justify-content: center
+			background: var(--rights-icon-bg)
+			border: 1px solid var(--rights-icon-border)
+			flex-shrink: 0
+
+	.rights-header
+		display: grid
+		grid-template-columns: 120px 1fr 1fr
+		padding: 0 12px 8px
+		border-bottom: 1px solid var(--border-default)
+
+		span
+			font-size: 10px
+			font-weight: 600
+			text-transform: uppercase
+			letter-spacing: 1px
+			color: var(--text-muted)
+
+			&:not(:first-child)
+				text-align: center
+
+	.block-rights-wrap
+		overflow-y: auto
+		max-height: 320px
+
+		&::-webkit-scrollbar
+			width: 4px
+		&::-webkit-scrollbar-track
+			background: transparent
+		&::-webkit-scrollbar-thumb
+			background: var(--border-default)
+			border-radius: 2px
+
+		.rights-row
+			display: grid
+			grid-template-columns: 120px 1fr 1fr
+			align-items: center
+			padding: 10px 12px
+			border-radius: 4px
+			transition: background 0.15s
+			font-size: 13px
 
 			&:hover
-				background-color: rgba(255,255,255, 0.15)
-				cursor: pointer
-			
-			.level
-				grid-column: 1
+				background: rgba(255,255,255,0.03)
 
-			.block-rights-inner
-				grid-column: 2
+			&.upcoming .rights-block
+				color: var(--rights-color)
+
+			.baker-dot
+				width: 8px
+				height: 8px
+				border-radius: 20%
+				margin-right: 6px
+
+			.rights-block
+				font-family: var(--font-mono)
+				font-weight: 600
+				color: var(--text-primary)
+
+			.rights-stats
 				display: flex
 				align-items: center
-				min-width: 150px
-			
-				
-				.no-rights
-					filter: grayscale(0.75) opacity(0.44)
-				.baker-block-rights
-					// display: inline-flex
-					// align-items: center
-					display: grid
-					grid-template-columns: 120px 30px 120px 30px 
+				gap: 6px
+				justify-content: center
 
-					.value
-						display: inline-flex
-						justify-content: right
-						align-items: center
-						white-space: nowrap
-						margin-right: var(--spacing-f2)
-						&.warning
-							color: var(--warning-color)
-						
-						&.success
-							color: var(--success-color)
+				.rights-count
+					font-family: var(--font-mono)
+					font-weight: 500
+					color: var(--text-secondary)
 
-	.icon
-		display: inline-block
-		width: 30px
-		height: 30px
-		fill: var(--text-color)
+					&.no-rights
+						opacity: 0.4
 
-.baker-assigned-color
-	display: inline-block
+					&.warning
+						color: var(--warning-color)
 
-	.baker-assigned-color-sign
-		display: inline-block
-		width: 20px
-		height: 20px
-		border-radius: 20%
-		margin-right: var(--spacing-f2)
-		background-color: var(--assigned-color-color)
+					&.success
+						color: var(--success-color)
+
+				.rights-icon
+					width: 16px
+					height: 16px
+					display: flex
+					align-items: center
+					justify-content: center
+					opacity: 0.5
+
+					svg
+						width: 16px
+						height: 16px
+
+					&.dim
+						opacity: 0.25
 </style>

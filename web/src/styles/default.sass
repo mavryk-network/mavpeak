@@ -1,42 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap')
 @import './typography.sass'
 @import './scroll.sass'
 @import '@starlight/style.sass'
 
 :root
 	--spacing: 15px
-	--border-radius: 10px
-	--text-color: #eee
-	--error-color: #ff5575
-	--warning-color: rgb(255, 148, 66)
-	--success-color: lime
+	--border-radius: 6px
+	--text-color: #f1f5f9
+	--error-color: #f87171
+	--warning-color: #fbbf24
+	--success-color: #4ade80
 	--header-height: 50px
-	
+
+	// semantic text
+	--text-primary: #f1f5f9
+	--text-secondary: #94a3b8
+	--text-muted: #64748b
+	--border-default: #1e293b
+
+	// accent palette
+	--purple: #a855f7
+	--purple-dim: #7c3aed
+	--purple-glow: rgba(168, 85, 247, 0.15)
+	--cyan: #22d3ee
+	--cyan-dim: #06b6d4
+	--cyan-glow: rgba(34, 211, 238, 0.15)
+	--green: #4ade80
+	--green-dim: #22c55e
+	--green-glow: rgba(74, 222, 128, 0.15)
+	--amber: #fbbf24
+	--amber-dim: #f59e0b
+	--amber-glow: rgba(251, 191, 36, 0.15)
+	--blue: #60a5fa
+	--blue-dim: #3b82f6
+	--blue-glow: rgba(96, 165, 250, 0.15)
+	--slate: #94a3b8
+	--slate-dim: #64748b
+	--slate-glow: rgba(148, 163, 184, 0.08)
+	--teal: #2dd4bf
+	--teal-dim: #14b8a6
+	--teal-glow: rgba(45, 212, 191, 0.15)
+	--red: #f87171
+
 	// overrides
 	--nav-menu-size: 49px
 	--nav-menu-expanded-size: 190px
 	--nav-menu-box-shadow: unset
-	--card-box-shadow: rgba(255,255,255, 0.09) 0px 3px 6px, rgba(255, 255, 255, 0.09) 0px 3px 6px
-	//--nav-menu-item-height: 39px
-	// --card-horizontal-spacing: var(--spacing-x2)
-	// --card-vertical-spacing: var(--spacing-x2)
-
-
+	--card-background-color: #151c2c
+	--card-border-radius: 6px
+	--card-border: 1px solid #1e293b
+	--card-box-shadow: none
 
 	// fonts
 	--font-size: 1rem
+	--font-mono: 'JetBrains Mono', monospace
 	--line-height: 1.25
-	--letter-spacing: 0.1rem
+	--letter-spacing: 0
 	--header-size-factor: 0.2rem
-	--background-color: #111
+	--background-color: #0a0e17
 
 body
 	margin: 0px
 	font-size: var(--font-size)
 	line-height: var(--line-height)
 	background-color: var(--background-color)
+	background-image: radial-gradient(ellipse at 20% 0%, rgba(168, 85, 247, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 0%, rgba(34, 211, 238, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(74, 222, 128, 0.04) 0%, transparent 50%)
 
 html, body, form, fieldset, table, tr, td, img
-	font-family: 'Lato-Light', sans-serif !important
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important
 	letter-spacing: var(--letter-spacing)
 
 input, button, select, textarea, optgroup, option

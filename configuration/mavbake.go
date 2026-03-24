@@ -182,10 +182,9 @@ func (c *MavbakeModuleConfiguration) Validate() error {
 		} else {
 			ver := normalizeVersion(strings.TrimSpace(string(output)))
 			if !version.IsValid(ver) {
-				slog.Warn("Invalid arc binary version", "version", ver)
-			}
-
-			if version.Compare(ver, "v0.0.12") < 0 {
+				slog.Warn("Invalid arc binary version, ledger monitoring disabled", "version", ver)
+				c.ArcBinaryPath = ""
+			} else if version.Compare(ver, "v0.0.12") < 0 {
 				slog.Warn("Arc binary version is too old, please update", "version", ver)
 			}
 		}

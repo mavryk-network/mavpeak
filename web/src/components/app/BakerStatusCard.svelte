@@ -1,117 +1,183 @@
 <script lang="ts">
-	import Card from '@components/starlight/components/Card.svelte';
-	import Separator from '@components/app/Separator.svelte';
-	import { writeToClipboard } from '@src/util/clipboard';
-	import { formatBalance } from '@src/util/format';
-	import { calculateFreeSpace, calculateStakingCapacity, getBakerColor } from '@src/util/baker';
 	import type { BakerStatus } from '@src/common/types/status';
 
-	export let baker: string;
-	export let status: BakerStatus;
-	export let showColor = false;
+	export let status: BakerStatus | undefined = undefined;
 
-	$: bakerColor = getBakerColor(baker);
+	function formatMVRK(mumav: string | undefined): string {
+		try {
+			const val = Number(BigInt(mumav || '0')) / 1_000_000;
+			return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
+		} catch {
+			return '0';
+		}
+	}
+
+	$: stakedRatioPct = (() => {
+		try {
+			const full = Number(status?.full_balance || '0');
+			const staked = Number(status?.staked_balance || '0');
+			return full > 0 ? Math.round((staked / full) * 100) : 0;
+		} catch {
+			return 0;
+		}
+	})();
 </script>
 
-<Card>
-	<div class="baker-grid">
-		<div class="title">
-			<h5>
-				Baker
-				{#if showColor}
-					<div class="assigned-color" style:--assigned-color-color={bakerColor}>
-						<div class="assigned-color-sign"></div>
-					</div>
-				{/if}
-			</h5>
-			<button class="unstyle-button address" on:click={() => writeToClipboard(baker)}
-				>{baker}</button
-			>
+<div class="balance-bar">
+	<div class="bar-body">
+		<div class="bar-title">
+			<span class="icon">
+				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+			</span>
+			Validator Balance
 		</div>
-		<Separator />
-		<div class="balances">
-			<div class="title">Balance</div>
-			<div class="value">{formatBalance(status.balance)}</div>
-			<div class="title">Staked Balance</div>
-			<div class="value">{formatBalance(status.staked_balance)}</div>
-			<div class="title">External Staked Balance</div>
-			<div class="value">{formatBalance(status.external_staked_balance)}</div>
-			<div class="title">External Delegated Balance</div>
-			<div class="value">{formatBalance(status.external_delegated_balance)}</div>
-		</div>
-		<!-- <Separator /> -->
-		<!-- <div class="balances">
-			<div class="title">Staking Capacity</div>
-			<div class="value">{formatBalance(calculateStakingCapacity(status))}</div>
-			<div class="title">Free Space</div>
-			<div class="value">{formatBalance(calculateFreeSpace(status))}</div>
-		</div> -->
-
-		<div class="delegators">
-			<div class="value">{status.delegators_count}</div>
-			delegators
-		</div>
+		{#if status}
+			<div class="stat">
+				<span class="stat-label">Total Balance</span>
+				<span class="stat-value">{formatMVRK(status.full_balance)} <span class="currency">MVRK</span></span>
+			</div>
+			<div class="divider"></div>
+			<div class="stat">
+				<span class="stat-label">Staked</span>
+				<span class="stat-value">{formatMVRK(status.staked_balance)} <span class="currency">MVRK</span></span>
+			</div>
+			<div class="divider"></div>
+			<div class="stat">
+				<span class="stat-label">Available</span>
+				<span class="stat-value">{formatMVRK(status.liquid_balance)} <span class="currency">MVRK</span></span>
+			</div>
+			<div class="divider"></div>
+			<div class="ratio-wrap">
+				<span class="ratio-label">Staked ratio</span>
+				<div class="ratio-bar">
+					<div class="ratio-bar-fill" style:width="{stakedRatioPct}%"></div>
+				</div>
+				<span class="ratio-pct">{stakedRatioPct}%</span>
+			</div>
+		{:else}
+			<span class="loading-text">Fetching balance data...</span>
+		{/if}
 	</div>
-</Card>
+</div>
 
 <style lang="sass">
-	.baker-grid
-		display: grid
-		grid-template-columns: minmax(100px, 1fr)
-		gap: var(--spacing)
+.balance-bar
+	position: relative
+	background: #151c2c
+	border-radius: 6px
+	border: 1px solid #1e293b
+	overflow: hidden
+	transition: border-color 0.2s, box-shadow 0.2s
 
-		.title
-			position: relative
+	&:hover
+		border-color: rgba(45, 212, 191, 0.3)
+		box-shadow: 0 4px 20px rgba(45, 212, 191, 0.08)
 
-			h5
-				font-size: 1.5rem
-				font-weight: 500
-				margin: 0
-			
-			.address
-				margin: 0
-				margin-top: var(--spacing-f2)
-				font-size: 0.95rem
-		.balances
-			display: grid
-			grid-template-columns: auto 1fr auto
-			gap : var(--spacing-f2)
-			
-			div
-				display: flex
-				white-space: nowrap
-				align-items: center
-				margin: var(--spacing-f2) 0
-			
-			.title
-				grid-column: 1
-				justify-content: left
-
-			.value
-				grid-column: 3
-				justify-content: right
-
-		.bottom-separator
-			grid-row: 6
-			display: flex
-			align-items: flex-end
-		
-		.delegators
-			grid-row: 7
-			.value
-				font-size: 1.25rem
-				font-weight: 500
-				display: inline-block
-
-.assigned-color
-	.assigned-color-sign
+	&::before
+		content: ''
 		position: absolute
-		display: inline-block
-		width: 12px
-		height: 12px
-		border-radius: 20%
-		margin-right: var(--spacing-f2)
-		background-color: var(--assigned-color-color)
 		top: 0
+		left: 0
 		right: 0
+		height: 3px
+		background: linear-gradient(90deg, var(--teal), var(--teal-dim))
+		border-radius: 6px 6px 0 0
+		z-index: 1
+
+	.bar-body
+		padding: var(--card-vertical-spacing) var(--card-horizontal-spacing)
+		display: flex
+		align-items: center
+		gap: 32px
+
+	.bar-title
+		align-self: flex-start
+		font-size: 11px
+		font-weight: 600
+		text-transform: uppercase
+		letter-spacing: 1.5px
+		color: var(--teal)
+		display: flex
+		align-items: center
+		gap: 8px
+		white-space: nowrap
+
+		.icon
+			width: 20px
+			height: 20px
+			border-radius: 4px
+			display: flex
+			align-items: center
+			justify-content: center
+			background: var(--teal-glow)
+			border: 1px solid rgba(45, 212, 191, 0.3)
+			color: var(--teal)
+
+	.stat
+		display: flex
+		flex-direction: column
+		gap: 2px
+
+		.stat-label
+			font-size: 10px
+			font-weight: 600
+			text-transform: uppercase
+			letter-spacing: 1px
+			color: var(--text-muted)
+
+		.stat-value
+			font-family: var(--font-mono)
+			font-size: 20px
+			font-weight: 700
+			color: var(--text-primary)
+
+		.currency
+			font-size: 12px
+			font-weight: 500
+			color: var(--teal)
+			margin-left: 4px
+
+	.divider
+		width: 1px
+		height: 36px
+		background: var(--border-default)
+		flex-shrink: 0
+
+	.ratio-wrap
+		flex: 1
+		display: flex
+		align-items: center
+		gap: 12px
+		min-width: 160px
+
+		.ratio-label
+			font-size: 11px
+			color: var(--text-muted)
+			white-space: nowrap
+
+		.ratio-bar
+			flex: 1
+			height: 6px
+			background: var(--border-default)
+			border-radius: 3px
+			overflow: hidden
+			min-width: 60px
+
+			.ratio-bar-fill
+				height: 100%
+				background: linear-gradient(90deg, var(--teal), var(--cyan-dim))
+				border-radius: 3px
+				transition: width 0.3s ease
+
+		.ratio-pct
+			font-family: var(--font-mono)
+			font-size: 13px
+			font-weight: 600
+			color: var(--teal)
+			white-space: nowrap
+
+.loading-text
+	font-size: 13px
+	color: var(--text-muted)
+	font-style: italic
 </style>

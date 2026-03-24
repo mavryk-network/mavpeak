@@ -11,79 +11,121 @@
 	} from '@app/state/mavbake';
 	import { state as mavpayStatus } from '@app/state/mavpay';
 	import NodeStatusCard from '@components/app/NodeStatusCard.svelte';
-	import BakerStatusCard from '@components/app/BakerStatusCard.svelte';
 	import BakerRightsCard from '@components/app/BakerRightsCard.svelte';
 	import ServicesStatusCard from '@components/app/ServicesStatusCard.svelte';
-
 	import GovernancePeriodCard from '@src/components/app/GovernancePeriodCard.svelte';
 	import PayoutsCard from '@src/components/app/PayoutsCard.svelte';
 	import LedgerStatusCard from '@src/components/app/LedgerStatusCard.svelte';
+	import BakerStatusCard from '@components/app/BakerStatusCard.svelte';
+	import { onMount } from 'svelte';
+	import type { BakerStatus } from '@src/common/types/status';
 
+	let initialBakerBalances: [string, BakerStatus][] = [];
+
+	onMount(async () => {
+		try {
+			const res = await fetch('/api/mavbake/bakers/balances');
+			if (res.ok) {
+				const data: Record<string, BakerStatus> = await res.json();
+				initialBakerBalances = Object.entries(data);
+			}
+		} catch {}
+	});
+
+	$: displayBakers = $mavbakeBakers.length > 0 ? $mavbakeBakers : initialBakerBalances;
 	$: showBakerColors = $mavbakeBakers.length > 1;
-	$: expandedBakingRights = $mavbakeBakers.length > 1;
+	$: bakerNodes = $nodes.filter(([t]) => !t.toLowerCase().includes('mvkt'));
+	$: mvktNodes = $nodes.filter(([t]) => t.toLowerCase().includes('mvkt'));
+	$: hasServices = Object.keys($mavbakeServices.applications ?? {}).length > 0;
 </script>
 
-<div class="dashboard-grid-wrap">
-	<div class="dashboard-grid">
-		{#if $mavbakeStatus}
-			{#each $mavbakeBakers as [baker, info]}
-				<BakerStatusCard baker={baker ?? {}} status={info} showColor={showBakerColors} />
+<div class="dashboard-wrap">
+	{#if $mavbakeStatus}
+		{#if displayBakers.length > 0}
+			{#each displayBakers as [baker, info]}
+				<BakerStatusCard status={info} />
 			{/each}
-			{#each $mavbakeWallets as [walletId, info]}
-				<LedgerStatusCard id={walletId.toUpperCase()} {info} />
-			{/each}
+		{:else}
+			<BakerStatusCard />
 		{/if}
-		{#if $mavpayStatus}
-			<PayoutsCard />
-		{/if}
-		{#if $mavbakeStatus}
-			<GovernancePeriodCard votingPeriodInfo={$votingPeriodInfo} />
-		{/if}
-		{#if Object.keys($mavbakeServices.applications ?? {}).length > 0}
-			<ServicesStatusCard title="Baker's Services" services={$mavbakeServices} />
-		{/if}
-		{#each $nodes as [node, info]}
-			<NodeStatusCard node={info} title={node} />
+		{#each $mavbakeWallets as [walletId, info]}
+			<LedgerStatusCard id={walletId.toUpperCase()} {info} />
 		{/each}
-		{#if $mavbakeStatus}
-			<div class="baker-rights" class:expanded={expandedBakingRights}>
-				<BakerRightsCard
-					mode="upcoming"
-					rights={$futureBakingRights}
-					{showBakerColors}
-					title="Upcoming Baking Rights"
-				/>
-			</div>
-			<div class="baker-rights" class:expanded={expandedBakingRights}>
-				<BakerRightsCard
-					mode="past"
-					rights={$pastBakingRights}
-					{showBakerColors}
-					title="Past Baking Rights"
-				/>
-			</div>
-		{/if}
+	{/if}
+
+	<!-- Top row: 3 columns -->
+	<div class="top-row">
+		<!-- Col 1: Validator Services -->
+		<div class="col">
+			{#if hasServices}
+				<ServicesStatusCard title="Validator Services" services={$mavbakeServices} />
+			{:else if $mavpayStatus}
+				<PayoutsCard />
+			{/if}
+		</div>
+
+		<!-- Col 2: Baker / Validator nodes -->
+		<div class="col">
+			{#each bakerNodes as [node, info]}
+				<NodeStatusCard node={info} title={node} />
+			{/each}
+		</div>
+
+		<!-- Col 3: MVKT stacked above Governance -->
+		<div class="stacked-col">
+			{#each mvktNodes as [node, info]}
+				<NodeStatusCard node={info} title={node} />
+			{/each}
+			{#if $mavbakeStatus}
+				<GovernancePeriodCard votingPeriodInfo={$votingPeriodInfo} />
+			{/if}
+		</div>
 	</div>
+
+	<!-- Bottom row: 2-col validation rights -->
+	{#if $mavbakeStatus}
+		<div class="bottom-row">
+			<BakerRightsCard
+				mode="upcoming"
+				rights={$futureBakingRights}
+				{showBakerColors}
+				title="Upcoming Validation Rights"
+			/>
+			<BakerRightsCard
+				mode="past"
+				rights={$pastBakingRights}
+				{showBakerColors}
+				title="Past Validation Rights"
+			/>
+		</div>
+	{/if}
 </div>
 
 <style lang="sass">
-.dashboard-grid-wrap
-	display: grid
-	grid-template-columns: 1fr minmax(0px, 1400px) 1fr
-	width: calc(100% - var(--spacing) * 2)
-	padding: var(--spacing)
+.dashboard-wrap
+	display: flex
+	flex-direction: column
 	gap: var(--spacing)
+	padding: var(--spacing) var(--spacing-x2) var(--spacing-x3)
 
-	.dashboard-grid
+	.top-row
 		display: grid
-		grid-column: 2
-		grid-template-columns: repeat(auto-fill, minmax(450px, 1fr))
+		grid-template-columns: 1fr 1fr 1fr
 		gap: var(--spacing)
+		align-items: stretch
 
-		.baker-rights
-			display: grid
-			grid-template-rows: 1fr
+		.col
+			display: flex
+			flex-direction: column
+			gap: var(--spacing)
 
-			&.expanded
-				grid-column: 1 / -1
+		.stacked-col
+			display: flex
+			flex-direction: column
+			gap: var(--spacing)
+
+	.bottom-row
+		display: grid
+		grid-template-columns: 1fr 1fr
+		gap: var(--spacing)
 </style>

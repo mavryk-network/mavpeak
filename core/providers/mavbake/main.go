@@ -100,6 +100,19 @@ func SetupModule(ctx context.Context, configuration *configuration.MavbakeModule
 		}
 	}()
 
+	app.Get("/mavbake/bakers/balances", func(c *fiber.Ctx) error {
+		result := map[string]*BakerStakingStatus{}
+		for _, baker := range configuration.Bakers {
+			status, err := getBakerStatusFor(c.Context(), baker)
+			if err != nil {
+				slog.Debug("failed to get baker balance via api", "baker", baker, "error", err.Error())
+				continue
+			}
+			result[baker] = status
+		}
+		return c.JSON(result)
+	})
+
 	if configuration.RightsBlockWindow > 1 {
 		startRightsStatusProviders(ctx, configuration.Bakers, configuration.RightsBlockWindow, mavbakeStatusChannel)
 	}

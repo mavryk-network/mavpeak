@@ -3,39 +3,27 @@
 	import '@src/styles/default.sass';
 	import '@xterm/xterm/css/xterm.css';
 
-	import { APP_STATUS_LEVEL } from '@app/state/status';
-	import { APP_ID, APP_CONNECTION_STATUS } from '@app/state/index';
-
-	$: animateStatusBar = $APP_STATUS_LEVEL === 'warning' || $APP_STATUS_LEVEL === 'error';
-	$: centerStatusBar = $APP_STATUS_LEVEL === 'ok';
+	import { APP_CONNECTION_STATUS } from '@app/state/index';
 </script>
 
 <div class="layout-grid">
-	<div class="background"></div>
 	<header>
-		<!-- <slot name="header" /> -->
 		<div class="title-wrap">
 			<a class="unstyle-link" href="/about">
 				<img src="/assets/mavpeak-logo-white.png" alt="MavPeak" class="nav-logo" />
 			</a>
-			<div class="connection-status">
-				<div
-					class="connection-status-sign"
-					class:connected={$APP_CONNECTION_STATUS === 'connected'}
-					class:reconnecting={$APP_CONNECTION_STATUS === 'reconnecting'}
-					class:paused={$APP_CONNECTION_STATUS === 'paused'}
-				></div>
+			<div
+				class="connection-status"
+				class:connected={$APP_CONNECTION_STATUS === 'connected'}
+				class:reconnecting={$APP_CONNECTION_STATUS === 'reconnecting'}
+				class:paused={$APP_CONNECTION_STATUS === 'paused'}
+			>
+				<div class="connection-status-sign"></div>
 				{$APP_CONNECTION_STATUS}
 			</div>
 		</div>
-		<div
-			class="status-bar"
-			class:ok={$APP_STATUS_LEVEL === 'ok'}
-			class:warning={$APP_STATUS_LEVEL === 'warning'}
-			class:animate={animateStatusBar}
-			class:center={centerStatusBar}
-		></div>
 	</header>
+
 	<main>
 		<slot />
 	</main>
@@ -44,20 +32,9 @@
 	</footer>
 </div>
 
-<!-- <div id="menu-layer"></div> -->
 <style lang="sass">
 :root
 	--menu-gap: var(--spacing)
-
-.background
-	position: fixed
-	height: 100vh
-	width: 100vw
-	pointer-events: none
-	background-color: #000000
-	background-size: cover
-	background-position: center
-	z-index: -2
 
 .layout-grid
 	position: relative
@@ -67,9 +44,8 @@
 	grid-template-columns: minmax(100px, 1fr)
 	grid-template-rows: var(--header-height) 1fr
 	grid-template-areas: "header" "main" "footer"
-	grid-column-gap: var(--menu-gap)
 	color: var(--text-color)
-	
+
 	header
 		position: fixed
 		height: var(--header-height)
@@ -77,69 +53,66 @@
 		display: flex
 		justify-content: left
 		align-items: center
-		
 		z-index: 100
-		background-color: var(--background-color)
+		background: rgba(10, 14, 23, 0.8)
+		backdrop-filter: blur(12px)
+		border-bottom: 1px solid var(--border-default)
 
 		.title-wrap
 			display: grid
 			width: 100vw
 			grid-template-columns: auto 1fr auto
 			align-items: center
-			padding: 0 var(--spacing)
-			text-transform: uppercase
+			padding: 0 var(--spacing-x2)
 
 			.nav-logo
 				height: 28px
 				width: auto
 				display: block
-		
+
 		.connection-status
 			grid-column: 3
-		
+			display: flex
+			align-items: center
+			gap: 8px
+			padding: 6px 14px
+			border-radius: 20px
+			font-size: 13px
+			font-weight: 500
+			text-transform: uppercase
+			letter-spacing: 1px
+			background: rgba(248, 113, 113, 0.1)
+			border: 1px solid rgba(248, 113, 113, 0.3)
+			color: var(--red)
+
+			&.connected
+				background: var(--green-glow)
+				border-color: rgba(74, 222, 128, 0.3)
+				color: var(--green)
+
+			&.reconnecting, &.paused
+				background: rgba(251, 191, 36, 0.1)
+				border-color: rgba(251, 191, 36, 0.3)
+				color: var(--amber)
+
 			.connection-status-sign
 				display: inline-block
-				width: 12px
-				height: 12px
+				width: 8px
+				height: 8px
 				border-radius: 50%
-				margin-right: var(--spacing-f2)
-				background-color: var(--error-color)
+				background-color: var(--red)
+				animation: pulse 2s ease-in-out infinite
 
-				&.connected
-					background-color: var(--success-color) !important
-				
-				&.reconnecting
-					background-color: var(--warning-color) !important
-				
-				&.paused
-					background-color: var(--warning-color) !important
+			&.connected .connection-status-sign
+				background-color: var(--success-color)
 
-		.status-bar
-			position: absolute
-			left: 0
-			bottom: 0
-			width: 100vw
-			height: 2px
-			background-size: 200% 100% !important
-			background: linear-gradient(to right, transparent, var(--error-color), transparent)
-
-			&.ok
-				background: linear-gradient(to right, transparent, var(--success-color), transparent)
-
-			&.warning
-				background: linear-gradient(to right, transparent, var(--warning-color), transparent)
-
-			&.animate
-				animation: slide 5s linear infinite
-			
-			&.center
-				background-position: center
+			&.reconnecting .connection-status-sign, &.paused .connection-status-sign
+				background-color: var(--amber)
 
 	main
 		position: relative
 		grid-area: main
-		overflow-x: hidden
-		//min-height: 100vh
+		overflow-x: clip
 
 	footer
 		position: fixed
@@ -147,18 +120,15 @@
 		width: 100%
 		grid-area: footer
 		justify-content: center
-		color: var(--text-color)
+		color: var(--text-muted)
+		font-size: 12px
 		padding-bottom: var(--spacing-f2)
 		bottom: 0
 		z-index: -1
 
-	
-@keyframes slide
-	0%
-		background-position: left
+@keyframes pulse
+	0%, 100%
+		opacity: 1
 	50%
-		background-position: right
-	100%
-		background-position: left
-
+		opacity: 0.5
 </style>

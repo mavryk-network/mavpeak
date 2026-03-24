@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"strings"
 
-	"github.com/mavryk-network/mavpeak/constants"
 	"github.com/mavryk-network/mavpeak/core/common"
 	"github.com/mavryk-network/gomavryk/rpc"
 	"github.com/mavryk-network/gomavryk/mavryk"
@@ -31,46 +29,34 @@ func (s *BakersStatusUpdate) GetData() any {
 }
 
 type BakerStakingStatus struct {
-	Balance                  string  `json:"balance"`
-	OwnFrozen                mavryk.Z `json:"own_frozen"`
-	StakedBalance            string  `json:"staked_balance"`
-	StakedFrozen             mavryk.Z `json:"staked_frozen"`
-	ExternalStakedBalance    string  `json:"external_staked_balance"`
-	Delegated                mavryk.Z `json:"delegated"`
-	ExternalDelegatedBalance string  `json:"external_delegated_balance"`
-	DelegatorsCount          int     `json:"delegators_count"`
+	FullBalance    string `json:"full_balance"`
+	StakedBalance  string `json:"staked_balance"`
+	LiquidBalance  string `json:"liquid_balance"`
 }
 
-func getDelegateDelegatedContracts(ctx context.Context, client *common.ActiveRpcNode, addr mavryk.Address, id rpc.BlockID) ([]mavryk.Address, error) {
-	u := fmt.Sprintf("chains/main/blocks/%s/context/delegates/%s/delegated_contracts", id, addr)
+func getBakerBalances(ctx context.Context, client *common.ActiveRpcNode, addr mavryk.Address, id rpc.BlockID) (*BakerStakingStatus, error) {
+	base := fmt.Sprintf("chains/main/blocks/%s/context/contracts/%s", id, addr)
 
-	var delegatedContracts []mavryk.Address
-	err := client.Get(ctx, u, &delegatedContracts)
-	if err != nil {
-		if strings.Contains(err.Error(), "delegate.not_registered") {
-			return []mavryk.Address{}, constants.ErrDelegateNotRegistered
-		}
-		var rpcErrors []rpc.GenericError
-		err2 := client.Get(ctx, u, &rpcErrors)
-		if err2 != nil {
-			return nil, err
-		}
-		for _, rpcError := range rpcErrors {
-			if strings.Contains(rpcError.ID, "delegate.not_registered") {
-				return []mavryk.Address{}, constants.ErrDelegateNotRegistered
-			}
-		}
+	var fullBalance mavryk.Z
+	if err := client.Get(ctx, base+"/full_balance", &fullBalance); err != nil {
+		return nil, fmt.Errorf("full_balance: %w", err)
 	}
 
-	return delegatedContracts, err
-}
+	var stakedBalance mavryk.Z
+	if err := client.Get(ctx, base+"/staked_balance", &stakedBalance); err != nil {
+		return nil, fmt.Errorf("staked_balance: %w", err)
+	}
 
-func getDelegateStakingStatusFromRawContext(ctx context.Context, client *common.ActiveRpcNode, delegate mavryk.Address, id rpc.BlockID) (*BakerStakingStatus, error) {
-	u := fmt.Sprintf("chains/main/blocks/%s/context/raw/json/staking_balance/%s", id, delegate)
+	var liquidBalance mavryk.Z
+	if err := client.Get(ctx, base+"/balance", &liquidBalance); err != nil {
+		return nil, fmt.Errorf("balance: %w", err)
+	}
 
-	var status BakerStakingStatus
-	err := client.Get(ctx, u, &status)
-	return &status, err
+	return &BakerStakingStatus{
+		FullBalance:   fullBalance.String(),
+		StakedBalance: stakedBalance.String(),
+		LiquidBalance: liquidBalance.String(),
+	}, nil
 }
 
 func getBakerStatusFor(ctx context.Context, baker string) (*BakerStakingStatus, error) {
@@ -78,31 +64,12 @@ func getBakerStatusFor(ctx context.Context, baker string) (*BakerStakingStatus, 
 	if err != nil {
 		return nil, err
 	}
-	status, err := common.AttemptWithRpcClients(ctx, func(client *common.ActiveRpcNode) (*BakerStakingStatus, error) {
+	return common.AttemptWithRpcClients(ctx, func(client *common.ActiveRpcNode) (*BakerStakingStatus, error) {
 		if !client.IsGovernanceProvider {
-			return nil, errors.New("node is not a rights provider")
+			return nil, errors.New("node is not a governance provider")
 		}
-		acc, err := getDelegateStakingStatusFromRawContext(ctx, client, addr, rpc.Head)
-		if err != nil {
-			return nil, err
-		}
-		balance, err := client.GetContractBalance(ctx, addr, rpc.Head)
-		if err != nil {
-			return nil, err
-		}
-		acc.Balance = balance.String()
-		delegators, err := getDelegateDelegatedContracts(ctx, client, addr, rpc.Head)
-		if err != nil {
-			return nil, err
-		}
-		acc.DelegatorsCount = len(delegators)
-		acc.StakedBalance = acc.OwnFrozen.String()
-		acc.ExternalStakedBalance = acc.StakedFrozen.String()
-		acc.ExternalDelegatedBalance = acc.Delegated.Sub(balance).String()
-
-		return acc, nil
+		return getBakerBalances(ctx, client, addr, rpc.Head)
 	})
-	return status, err
 }
 
 func setupBakerStatusProviders(ctx context.Context, bakers []string, statusChannel chan<- common.StatusUpdate) {
@@ -123,7 +90,6 @@ func setupBakerStatusProviders(ctx context.Context, bakers []string, statusChann
 				return
 			case block, ok := <-blockChannel:
 				if !ok {
-					// levelChannel is closed, exit the loop
 					return
 				}
 

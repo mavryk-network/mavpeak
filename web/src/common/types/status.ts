@@ -64,13 +64,9 @@ export type ServicesStatus = {
 };
 
 export type BakerStatus = {
-	deactivated: boolean;
-	balance: string;
-	//delegated_contracts: Array<string>
-	delegators_count: number;
+	full_balance: string;
 	staked_balance: string;
-	external_staked_balance: string;
-	external_delegated_balance: string;
+	liquid_balance: string;
 };
 
 export type BakersStatus = {

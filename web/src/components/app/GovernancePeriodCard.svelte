@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Separator from './Separator.svelte';
 	import Card from '@components/starlight/components/Card.svelte';
 	import type { VotingPeriodInfo } from '@src/common/types/status';
 	import { getVotingPeriodTimeLeft } from '@src/util/gov';
 	import { onDestroy } from 'svelte';
-	import Button from '../starlight/components/Button.svelte';
 
 	export let votingPeriodInfo: VotingPeriodInfo | undefined;
 
@@ -16,35 +14,34 @@
 	}, 500);
 
 	onDestroy(() => clearInterval(interval));
-
-	function open_governance() {
-		goto('/governance');
-	}
 </script>
 
 <div class="governance-wrap">
 	<Card class="governance-card">
 		<div class="governance">
-			<div class="title">
-				<h5>Governance</h5>
+			<div class="card-title">
+				<span class="icon">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+				</span>
+				Governance
 			</div>
-			<Separator />
+
 			{#if votingPeriodInfo}
 				<div class="period-info">
-					<div class="kind">{votingPeriodInfo?.voting_period.kind}</div>
-					<div class="period">period</div>
-					<div class="index">
-						#{votingPeriodInfo.voting_period.index}
+					<div class="period-main">
+						<span class="kind">{votingPeriodInfo?.voting_period.kind}</span>
+						<span class="period-label">period #{votingPeriodInfo.voting_period.index}</span>
 					</div>
-					<div class="remaining">
-						ends in
-						<div class="value">{timeLeft}</div>
+					<div class="timer">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+						ends in {timeLeft}
 					</div>
 				</div>
 			{:else}
 				<div class="no-data">NO DATA</div>
 			{/if}
-			<Button on:click={open_governance}>OPEN</Button>
+
+			<button class="btn-open" on:click={() => goto('/governance')}>OPEN</button>
 		</div>
 	</Card>
 </div>
@@ -52,74 +49,100 @@
 <style lang="sass">
 .governance-wrap
 	display: grid
-	grid-template-rows: 1fr
-	width: 100%
 	height: 100%
 	user-select: none
-	// &:hover
-	// 	cursor: pointer
-	// 	transition: background-color 0.2s
-	// 	--card-background-color: #151515
 
 	:global(.governance-card)
-		box-sizing: border-box
 		height: 100%
+		box-sizing: border-box
+		--card-accent: linear-gradient(90deg, var(--purple), var(--purple-dim))
+		--card-hover-shadow: 0 8px 32px var(--purple-glow)
 
 .governance
 	display: grid
-	grid-template-rows: auto auto 1fr auto auto
+	grid-template-rows: auto 1fr auto
 	height: 100%
 	gap: var(--spacing)
-	.title
+
+	.card-title
 		display: flex
-		justify-content: center
-		h5
-			font-size: 1.5rem
-			font-weight: 500
-			margin: 0
+		align-items: center
+		gap: 8px
+		font-size: 13px
+		font-weight: 600
+		text-transform: uppercase
+		letter-spacing: 1.5px
+		color: var(--purple)
+
+		.icon
+			width: 20px
+			height: 20px
+			border-radius: 6px
+			display: flex
+			align-items: center
+			justify-content: center
+			background: var(--purple-glow)
+			border: 1px solid rgba(168, 85, 247, 0.3)
+			flex-shrink: 0
 
 	.period-info
-		display: grid
-		grid-template-columns:  1fr
-		grid-template-rows: 1fr auto auto auto 1fr
-		justify-content: center
-		gap: var(--spacing-f2)
-		width: 100%
-		
-		.index, .kind
-			display: flex
-			justify-content: center
-			font-size: 1.5rem
-			font-weight: 500
-
-		.index
-			grid-row: 4
-
-		.period 
-			display: flex
-			justify-content: center
-			grid-row: 3
-
-		.kind
-			text-transform: uppercase
-			grid-row: 2
-	.remaining
 		display: flex
-		justify-content: right
-		align-items: flex-end
-		grid-row: 5
+		flex-direction: column
+		gap: 12px
+		justify-content: center
 
-		.value
-			display: inline-block
-			padding-left : var(--spacing-f2)
-			font-size: 1.25rem
+		.period-main
+			display: flex
+			align-items: baseline
+			gap: 10px
+			flex-wrap: wrap
+
+			.kind
+				font-size: 28px
+				font-weight: 700
+				color: var(--purple)
+				text-transform: capitalize
+
+			.period-label
+				font-family: var(--font-mono)
+				font-size: 14px
+				color: var(--text-secondary)
+
+		.timer
+			display: inline-flex
+			align-items: center
+			gap: 6px
+			padding: 6px 16px
+			border-radius: 8px
+			background: var(--purple-glow)
+			border: 1px solid rgba(168, 85, 247, 0.2)
+			color: var(--purple)
+			font-size: 13px
 			font-weight: 500
+			width: fit-content
 
 	.no-data
 		display: flex
-		justify-content: center
 		align-items: center
+		justify-content: center
 		font-size: 1.5rem
-		font-weight: 500
-		height: 100%
+		color: var(--text-muted)
+
+	.btn-open
+		width: 100%
+		padding: 12px
+		border: 1px solid rgba(168, 85, 247, 0.3)
+		border-radius: 4px
+		background: var(--purple-glow)
+		color: var(--purple)
+		font-family: 'Inter', sans-serif
+		font-size: 14px
+		font-weight: 600
+		cursor: pointer
+		transition: all 0.2s
+		letter-spacing: 0.5px
+
+		&:hover
+			background: rgba(168, 85, 247, 0.25)
+			border-color: var(--purple)
 </style>

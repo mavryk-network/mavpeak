@@ -51,10 +51,6 @@
 			height: calc(100% - var(--footer-height))
 			margin:0 !important
 			
-			.logo
-				width: 350px
-				max-width: 40vw
-				max-height: 20vh
 			.title
 				height: 40px
 				width: auto

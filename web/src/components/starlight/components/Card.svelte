@@ -28,5 +28,22 @@
 	max-width: var(--card-max-width)
 	max-height: var(--card-max-height)
 	overflow: var(--card-overflow)
+	transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s
+
+	&:hover
+		transform: translateY(-2px)
+		border-color: rgba(255, 255, 255, 0.1)
+		box-shadow: var(--card-hover-shadow, none)
+
+	&::before
+		content: ''
+		position: absolute
+		top: 0
+		left: 0
+		right: 0
+		height: 3px
+		background: var(--card-accent, transparent)
+		border-radius: var(--card-border-radius) var(--card-border-radius) 0 0
+		z-index: 1
 
 </style>
